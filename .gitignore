@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+
+# production
+build/
+dist/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+
+# env
+.env*.local
+
+# typescript
+next-env.d.ts
+*.tsbuildinfo
+
+# legacy / assets originales (se conservan fuera del control de versiones)
+imagenes.zip
+Page-catalogo.zip
+.venv/
