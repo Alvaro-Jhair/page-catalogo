@@ -43,14 +43,20 @@ async function githubRequest(path: string, token: string, init?: RequestInit) {
 }
 
 export type CommitFileResult = { commitUrl: string };
+export type CommitFileInput = { path: string; base64Content: string };
 
 /**
- * Comitea un archivo (texto o binario) al repo vía la Git Data API
- * (blob -> tree -> commit -> mover la rama), no la API de "contenidos"
- * simple — esa tiene un límite de 1MB por archivo, y las fotos reales
- * de este catálogo pesan 1.5-2.6MB. La Git Data API no tiene ese techo,
- * y sirve igual de bien para el JSON (chico) de un catálogo, así que
- * todo el proyecto comitea por este único camino.
+ * Comitea uno o más archivos (texto o binario) al repo en un solo
+ * commit, vía la Git Data API (blobs -> un tree -> commit -> mover la
+ * rama), no la API de "contenidos" simple — esa tiene un límite de 1MB
+ * por archivo, y las fotos reales de este catálogo pesan 1.5-2.6MB. La
+ * Git Data API no tiene ese techo, y sirve igual de bien para el JSON
+ * (chico) de un catálogo, así que todo el proyecto comitea por este
+ * único camino. Crear un catálogo nuevo necesita 3 archivos a la vez
+ * (su JSON, su loader .ts, y el registro actualizado) — de ahí que esto
+ * acepte una lista en vez de un solo archivo: son 3 blobs pero un único
+ * tree/commit, así que nunca queda el repo con solo 2 de los 3 creados
+ * a medio camino si algo falla.
  *
  * Nota: cada llamada mueve la rama a un commit nuevo basado en el HEAD
  * *en ese momento* — dos llamadas concurrentes podrían pisarse. Alcance
@@ -58,18 +64,21 @@ export type CommitFileResult = { commitUrl: string };
  * si hiciera falta more concurrencia, acá es donde se agregaría un
  * reintento con el ref actualizado.
  */
-export async function commitFile(
-  path: string,
-  base64Content: string,
+export async function commitFiles(
+  files: CommitFileInput[],
   message: string
 ): Promise<CommitFileResult> {
   const { token, repo, branch } = getGitHubConfig();
 
-  // 1. Blob con el contenido nuevo.
-  const blob = await githubRequest(`/repos/${repo}/git/blobs`, token, {
-    method: "POST",
-    body: JSON.stringify({ content: base64Content, encoding: "base64" }),
-  });
+  // 1. Un blob por archivo con su contenido nuevo.
+  const blobs = await Promise.all(
+    files.map((file) =>
+      githubRequest(`/repos/${repo}/git/blobs`, token, {
+        method: "POST",
+        body: JSON.stringify({ content: file.base64Content, encoding: "base64" }),
+      })
+    )
+  );
 
   // 2. HEAD actual de la rama -> su commit -> el tree base sobre el que construir.
   const ref = await githubRequest(`/repos/${repo}/git/ref/heads/${branch}`, token);
@@ -77,12 +86,17 @@ export async function commitFile(
   const baseCommit = await githubRequest(`/repos/${repo}/git/commits/${baseCommitSha}`, token);
   const baseTreeSha = baseCommit.tree.sha;
 
-  // 3. Tree nuevo: el base más este archivo (agregado o reemplazado).
+  // 3. Tree nuevo: el base más estos archivos (agregados o reemplazados).
   const tree = await githubRequest(`/repos/${repo}/git/trees`, token, {
     method: "POST",
     body: JSON.stringify({
       base_tree: baseTreeSha,
-      tree: [{ path, mode: "100644", type: "blob", sha: blob.sha }],
+      tree: files.map((file, i) => ({
+        path: file.path,
+        mode: "100644",
+        type: "blob",
+        sha: blobs[i].sha,
+      })),
     }),
   });
 
@@ -99,4 +113,13 @@ export async function commitFile(
   });
 
   return { commitUrl: commit.html_url };
+}
+
+/** Caso particular de {@link commitFiles} para un solo archivo. */
+export async function commitFile(
+  path: string,
+  base64Content: string,
+  message: string
+): Promise<CommitFileResult> {
+  return commitFiles([{ path, base64Content }], message);
 }

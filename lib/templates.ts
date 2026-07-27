@@ -1,4 +1,5 @@
 import type { Block, ChapterHero, ProductVariant, SwatchItem } from "@/data/schema";
+import { slugify } from "./slug";
 
 /**
  * "Template" en el sentido del roadmap (Fase 6): una composición de
@@ -18,16 +19,6 @@ export type ColorwayTemplateInput = {
   /** El chip del swatch puede ser esa misma foto o un color plano; a diferencia del fondo, no compromete el diseño de las páginas a pantalla completa. */
   swatch: { type: "image" } | { type: "color"; color: string };
 };
-
-function slugify(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // quita acentos (á -> a, etc.)
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 export function createColorwayBlocks(input: ColorwayTemplateInput): [Block, Block] {
   const id = slugify(input.colorwayName) || `colorway-${Date.now()}`;

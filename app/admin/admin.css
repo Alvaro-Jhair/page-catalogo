@@ -112,6 +112,67 @@
   padding: 24px;
 }
 
+/* ---- catalog list (/admin) ---- */
+
+.admin-catalog-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-catalog-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid #e2e2df;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.admin-catalog-card:hover {
+  border-color: #c9c9c4;
+}
+
+.admin-catalog-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.admin-catalog-card-meta {
+  font-size: 0.78rem;
+  color: #6a6a64;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ---- add catalog ---- */
+
+.admin-add-catalog {
+  padding: 14px;
+  background: #fff;
+  border: 1px dashed #c9c9c4;
+  border-radius: 8px;
+}
+
+.admin-add-catalog-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-add-catalog-fields input[type="text"] {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid #d5d5d0;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
 .admin-btn {
   padding: 8px 14px;
   border-radius: 5px;

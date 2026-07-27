@@ -74,13 +74,14 @@ function makeKey(): string {
 }
 
 type AdminEditorProps = {
+  catalogId: string;
   initialBlocks: Block[];
   initialTheme: CatalogTheme;
 };
 
 type SaveResult = Awaited<ReturnType<typeof saveCatalogAction>>;
 
-export default function AdminEditor({ initialBlocks, initialTheme }: AdminEditorProps) {
+export default function AdminEditor({ catalogId, initialBlocks, initialTheme }: AdminEditorProps) {
   const [items, setItems] = useState<EditableBlock[]>(() =>
     initialBlocks.map((block) => ({ key: makeKey(), block }))
   );
@@ -108,6 +109,7 @@ export default function AdminEditor({ initialBlocks, initialTheme }: AdminEditor
     setResult(null);
     startTransition(async () => {
       const res = await saveCatalogAction(
+        catalogId,
         theme,
         items.map((item) => item.block)
       );

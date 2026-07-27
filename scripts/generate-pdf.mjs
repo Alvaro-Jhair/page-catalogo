@@ -9,23 +9,27 @@ import { chromium } from "playwright";
 import vercelChromium from "@sparticuz/chromium";
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
+import { readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 
-// Por ahora solo existe el catálogo "ariel" (ver data/catalogs/index.ts).
-// El día que haya un segundo catálogo real, esto pasa a iterar sobre el
-// registro en vez de tener un id hardcodeado acá.
-const CATALOG_ID = "ariel";
+// Un catálogo = un data/catalogs/<id>.json (ver data/catalogs/index.ts,
+// que sigue exactamente esa misma convención). Leer el directorio en
+// vez de mantener una lista de ids hardcodeada acá es lo que hace que
+// agregar un catálogo desde el panel (lib/catalogStore.ts) no requiera
+// tocar este script — apenas el commit trae el .json nuevo, el próximo
+// build ya genera su PDF.
+function getCatalogIds() {
+  return readdirSync(path.join(rootDir, "data", "catalogs"))
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => f.replace(/\.json$/, ""));
+}
 
 const PORT = process.env.PDF_GEN_PORT || "4173";
 const BASE_URL = `http://localhost:${PORT}`;
-// "/" es el índice de catálogos, no un catálogo en sí — hay que imprimir
-// la página del catálogo puntual.
-const CATALOG_URL = `${BASE_URL}/catalog/${CATALOG_ID}`;
-const OUTPUT_PATH = path.join(rootDir, "public", `catalog-${CATALOG_ID}.pdf`);
 
 // Dimensiones fijas del "viewport" de impresión: proporción retrato
 // 3:4, coherente con el diseño mobile-first del lookbook. Cada .page
@@ -66,24 +70,15 @@ async function waitForServer(url, timeoutMs = 30000) {
   throw new Error(`Timed out waiting for ${url}`);
 }
 
-async function main() {
-  console.log(`[generate-pdf] starting next start on port ${PORT}...`);
-  const server = spawn("npx", ["next", "start", "-p", PORT], {
-    cwd: rootDir,
-    stdio: "inherit",
-    env: process.env,
-  });
+async function printCatalog(browser, catalogId) {
+  const catalogUrl = `${BASE_URL}/catalog/${catalogId}`;
+  const outputPath = path.join(rootDir, "public", `catalog-${catalogId}.pdf`);
+  const viewportWidth = parseInt(PAGE_WIDTH, 10);
+  const viewportHeight = parseInt(PAGE_HEIGHT, 10);
 
-  let browser;
+  const page = await browser.newPage({ viewport: { width: viewportWidth, height: viewportHeight } });
   try {
-    await waitForServer(BASE_URL);
-    console.log("[generate-pdf] server ready, launching headless browser...");
-
-    browser = await launchBrowser();
-    const viewportWidth = parseInt(PAGE_WIDTH, 10);
-    const viewportHeight = parseInt(PAGE_HEIGHT, 10);
-    const page = await browser.newPage({ viewport: { width: viewportWidth, height: viewportHeight } });
-    await page.goto(CATALOG_URL, { waitUntil: "networkidle" });
+    await page.goto(catalogUrl, { waitUntil: "networkidle" });
 
     // El catálogo usa IntersectionObserver (RevealOnScroll) y lazy
     // loading nativo de next/image: ambos solo se disparan cuando el
@@ -92,7 +87,7 @@ async function main() {
     // lo que está debajo del primer tramo queda invisible o sin
     // cargar en el PDF (la portada se salva porque fuerza su propio
     // "visible" de entrada; el resto no).
-    console.log("[generate-pdf] scrolling through the page to trigger lazy content...");
+    console.log(`[generate-pdf] (${catalogId}) scrolling through the page to trigger lazy content...`);
     const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
     for (let y = 0; y < scrollHeight; y += viewportHeight) {
       await page.evaluate((y) => window.scrollTo(0, y), y);
@@ -117,7 +112,7 @@ async function main() {
     // de 1.5-2.6MB. Se espera explícitamente a que toda imagen haya
     // terminado de cargar y todo bloque RevealOnScroll esté marcado
     // visible, con un timeout generoso en vez de una espera a ciegas.
-    console.log("[generate-pdf] waiting for every image and reveal block to finish...");
+    console.log(`[generate-pdf] (${catalogId}) waiting for every image and reveal block to finish...`);
     await page.waitForFunction(
       () => {
         const images = Array.from(document.querySelectorAll("img"));
@@ -135,14 +130,38 @@ async function main() {
     await page.emulateMedia({ media: "print" });
 
     await page.pdf({
-      path: OUTPUT_PATH,
+      path: outputPath,
       width: PAGE_WIDTH,
       height: PAGE_HEIGHT,
       printBackground: true,
       margin: { top: "0", right: "0", bottom: "0", left: "0" },
     });
 
-    console.log(`[generate-pdf] wrote ${path.relative(rootDir, OUTPUT_PATH)}`);
+    console.log(`[generate-pdf] wrote ${path.relative(rootDir, outputPath)}`);
+  } finally {
+    await page.close();
+  }
+}
+
+async function main() {
+  console.log(`[generate-pdf] starting next start on port ${PORT}...`);
+  const server = spawn("npx", ["next", "start", "-p", PORT], {
+    cwd: rootDir,
+    stdio: "inherit",
+    env: process.env,
+  });
+
+  let browser;
+  try {
+    await waitForServer(BASE_URL);
+    console.log("[generate-pdf] server ready, launching headless browser...");
+
+    browser = await launchBrowser();
+
+    const catalogIds = getCatalogIds();
+    for (const catalogId of catalogIds) {
+      await printCatalog(browser, catalogId);
+    }
   } finally {
     if (browser) await browser.close();
     server.kill("SIGTERM");

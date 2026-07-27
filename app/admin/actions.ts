@@ -1,7 +1,7 @@
 "use server";
 
 import { requireSession } from "@/lib/session";
-import { saveCatalog, type SaveCatalogResult } from "@/lib/catalogStore";
+import { saveCatalog, createCatalog, type SaveCatalogResult, type CreateCatalogResult } from "@/lib/catalogStore";
 import { uploadAsset, type UploadAssetResult } from "@/lib/assets";
 import type { Block, CatalogTheme } from "@/data/schema";
 
@@ -11,6 +11,7 @@ import type { Block, CatalogTheme } from "@/data/schema";
  * proxy para estar protegida.
  */
 export async function saveCatalogAction(
+  catalogId: string,
   theme: CatalogTheme,
   blocks: Block[]
 ): Promise<SaveCatalogResult> {
@@ -24,7 +25,12 @@ export async function saveCatalogAction(
     data: { ...block.data, pageNumber: i + 1 },
   })) as Block[];
 
-  return saveCatalog("ariel", { theme, blocks: withPageNumbers });
+  return saveCatalog(catalogId, { theme, blocks: withPageNumbers });
+}
+
+export async function createCatalogAction(name: string): Promise<CreateCatalogResult> {
+  await requireSession();
+  return createCatalog(name);
 }
 
 export async function uploadAssetAction(
