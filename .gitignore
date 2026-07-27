@@ -27,4 +27,4 @@ Page-catalogo.zip
 .venv/
 
 # generado en cada build (scripts/generate-pdf.mjs) — no es fuente, se regenera solo
-public/catalog-ariel.pdf
+public/catalog-*.pdf

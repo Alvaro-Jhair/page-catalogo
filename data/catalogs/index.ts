@@ -8,12 +8,10 @@
 // de ids.
 
 import { catalogEntry as entry0 } from "./ariel";
-import { catalogEntry as entry1 } from "./example1";
 import type { CatalogEntry } from "../schema";
 
 export const catalogs = {
   ariel: entry0,
-  example1: entry1,
 } satisfies Record<string, CatalogEntry>;
 
 export type CatalogId = keyof typeof catalogs;
