@@ -341,4 +341,22 @@ Real bug from actually using the feature just shipped: `AddCatalogForm` used to 
 
 Added catalog deletion, extending the same atomic-commit machinery `createCatalog` already used rather than a separate path: `commitFiles` (`lib/github.ts`) now accepts `base64Content: null` on an entry to mean "delete this path" (the Git Data API's own convention — a tree entry with `sha: null`), so `deleteCatalog` removes a catalog's `.json` + `.ts` and regenerates the registry without its id, all in one commit, symmetric with how creating one adds them. Guards against deleting the last remaining catalog (an empty registry isn't a state anything downstream was designed to handle) and against an unknown id. The list UI (`CatalogList.tsx`, split out of the server-rendered `/admin` page into its own client component since delete needs `confirm()` + a Server Action + `router.refresh()`) disables the delete button when only one catalog is left, so the guard is visible before it's ever hit, not just a server-side rejection.
 
+2026-07-27 (fix — broken registry from a create/delete race; query GitHub live)
+
+Testing the create/delete flow for real against the live GitHub repo (with `GITHUB_TOKEN` actually configured this time, unlike the simulated check in the previous entry): deleting "example" and creating "example1" happened close enough together that the create action read the registry from a still-warm process that hadn't picked up the delete's redeploy yet — it regenerated `data/catalogs/index.ts` from a stale id list that still included the just-deleted "example", producing a registry that imports a file that no longer exists (confirmed: real broken build on Vercel, real `tsc` error locally).
+
+Fixed the immediate broken state, and fixed the root cause: `createCatalog` and `deleteCatalog` now list `data/catalogs/*.json` straight from GitHub's real HEAD (`lib/github.ts`'s new `listRepoJsonFileIds`) before regenerating the registry, instead of trusting `Object.keys(catalogs)` — which is only ever as fresh as the last deploy that finished.
+
+2026-07-27 (fix — PDF generation crashing on the second+ catalog on Vercel)
+
+With two real catalogs live in production (Ariel + the "example1" test catalog from the race above), Vercel's build wrote Ariel's PDF fine but crashed immediately on the second with "Target page, context or browser has been closed". Cause: `@sparticuz/chromium` runs with `--single-process`, which doesn't tolerate opening a new page after closing another — `scripts/generate-pdf.mjs` was opening and closing one `page` per catalog. Fixed by reusing a single `page` (navigated catalog to catalog) instead of one `newPage()`/`close()` per catalog.
+
+2026-07-27 (fix — text-shadow rendering as a solid rectangle in the PDF; example1 cleanup)
+
+Ariel's PDF looked right on desktop, but some mobile PDF viewers showed a solid rectangle behind text over photos instead of the expected soft shadow. Chromium rasterizes `text-shadow` as a separate layer when exporting to PDF, and those viewers don't composite that layer correctly. Text stays legible without the shadow (it already sits on a dark `.page-overlay`), so it's switched off only in `@media print` with `text-shadow: none !important` — the web version is untouched.
+
+Also removed `example1` — the `createStarterCatalog` placeholder that was left live on the real site from the create/delete testing described above — restoring `data/catalogs/index.ts` to just Ariel, the only real catalog that exists. Generalized `.gitignore` from `public/catalog-ariel.pdf` to `public/catalog-*.pdf`, since a second catalog generating its own PDF per build is now a real, exercised case rather than a hypothetical.
+
+Verified with a full `tsc --noEmit` + `npm run build` (including the PDF step) after all three fixes and the cleanup, plus a route-level smoke test (`/`, `/catalog/ariel`, `/admin`, `/catalog-ariel.pdf`) against a local `next start`, all returning the expected status codes.
+
 Verified the redirect fix and the disabled-delete-button state end-to-end with Playwright against a real running build (same GITHUB_TOKEN-missing limitation as catalog creation for the actual delete commit — the UI reaches the same config-error path `saveCatalog`/`createCatalog` already use, confirmed to fail gracefully rather than hang).
