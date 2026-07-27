@@ -18,7 +18,7 @@ export default async function AdminPage() {
         </div>
       </header>
       <main className="admin-main">
-        <AdminEditor initialBlocks={catalogs.ariel} />
+        <AdminEditor initialBlocks={catalogs.ariel.blocks} initialTheme={catalogs.ariel.theme} />
       </main>
     </AssetsProvider>
   );

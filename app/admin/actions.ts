@@ -3,14 +3,17 @@
 import { requireSession } from "@/lib/session";
 import { saveCatalog, type SaveCatalogResult } from "@/lib/catalogStore";
 import { uploadAsset, type UploadAssetResult } from "@/lib/assets";
-import type { Block } from "@/data/schema";
+import type { Block, CatalogTheme } from "@/data/schema";
 
 /**
  * Segunda verificación de sesión acá adentro (además del proxy) —
  * ninguna mutación real debe depender únicamente del redirect del
  * proxy para estar protegida.
  */
-export async function saveCatalogAction(blocks: Block[]): Promise<SaveCatalogResult> {
+export async function saveCatalogAction(
+  theme: CatalogTheme,
+  blocks: Block[]
+): Promise<SaveCatalogResult> {
   await requireSession();
 
   // pageNumber se deriva de la posición en el arreglo, nunca se edita a
@@ -21,7 +24,7 @@ export async function saveCatalogAction(blocks: Block[]): Promise<SaveCatalogRes
     data: { ...block.data, pageNumber: i + 1 },
   })) as Block[];
 
-  return saveCatalog("ariel", withPageNumbers);
+  return saveCatalog("ariel", { theme, blocks: withPageNumbers });
 }
 
 export async function uploadAssetAction(

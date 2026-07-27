@@ -4,6 +4,8 @@
   --line: #262626;
   --muted: #6f6a64;
   --accent: #d5c8b7;
+  --display-font: Georgia, "Times New Roman", serif;
+  --body-font: Arial, Helvetica, sans-serif;
 }
 
 * {
@@ -19,7 +21,17 @@ body {
   margin: 0;
   background: #eae5de;
   color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--body-font);
+}
+
+/* Re-declaring font-family here (not just inheriting body's computed
+   value) matters: --body-font/--display-font get overridden per
+   catalog as inline vars on this element (see CatalogRenderer), and a
+   custom property override only takes effect where a property is
+   re-resolved from it — a plain inherited computed value from body
+   would ignore the override entirely. */
+.catalog-root {
+  font-family: var(--body-font);
 }
 
 a {
@@ -126,7 +138,7 @@ a {
 }
 
 .cover-title h1 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--display-font);
   font-weight: 400;
   font-size: clamp(2.4rem, 7vw, 6.8rem);
   letter-spacing: 0.05em;
@@ -441,7 +453,7 @@ a {
 }
 
 .closing h2 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--display-font);
   font-size: clamp(3.2rem, 8vw, 7.4rem);
   font-weight: 400;
   letter-spacing: 0.06em;

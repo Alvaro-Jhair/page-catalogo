@@ -1,5 +1,5 @@
 import "server-only";
-import { CatalogBlocksSchema } from "@/data/schema";
+import { CatalogEntrySchema } from "@/data/schema";
 import { commitFile } from "./github";
 
 export type SaveCatalogResult =
@@ -12,16 +12,16 @@ export function catalogFilePath(catalogId: string): string {
 }
 
 /**
- * Valida `candidateBlocks` contra el modelo de datos (data/schema.ts) y,
- * solo si es válido, comitea el JSON resultante al repo. Nunca escribe
- * nada si la validación falla — el catálogo publicado nunca puede
- * quedar en un estado que no calce con el schema.
+ * Valida `candidateEntry` (tema + bloques) contra el modelo de datos
+ * (data/schema.ts) y, solo si es válido, comitea el JSON resultante al
+ * repo. Nunca escribe nada si la validación falla — el catálogo
+ * publicado nunca puede quedar en un estado que no calce con el schema.
  */
 export async function saveCatalog(
   catalogId: string,
-  candidateBlocks: unknown
+  candidateEntry: unknown
 ): Promise<SaveCatalogResult> {
-  const parsed = CatalogBlocksSchema.safeParse(candidateBlocks);
+  const parsed = CatalogEntrySchema.safeParse(candidateEntry);
   if (!parsed.success) {
     return {
       ok: false,

@@ -8,14 +8,14 @@
 // o precios en soles, y podría convivir con data/catalogs/otra-coleccion.json
 // el día que haya más de un catálogo.
 
-import { CatalogBlocksSchema } from "../schema";
-import type { Block } from "../schema";
+import { CatalogEntrySchema } from "../schema";
+import type { CatalogEntry } from "../schema";
 import arielData from "./ariel.json";
 
 /**
- * Se valida contra CatalogBlocksSchema al cargar el módulo: si el
+ * Se valida contra CatalogEntrySchema al cargar el módulo: si el
  * contenido no calza con el modelo de datos (data/schema.ts), esto
  * revienta ruidosamente en build/dev en vez de romper el catálogo en
  * silencio en producción.
  */
-export const catalogBlocks: Block[] = CatalogBlocksSchema.parse(arielData);
+export const catalogEntry: CatalogEntry = CatalogEntrySchema.parse(arielData);

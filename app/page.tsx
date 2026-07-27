@@ -23,8 +23,8 @@ export default function HomePage() {
         <p>Catálogos</p>
       </div>
       <div className="catalog-index-grid">
-        {entries.map(([id, blocks]) => {
-          const cover = getCoverBlock(blocks);
+        {entries.map(([id, entry]) => {
+          const cover = getCoverBlock(entry.blocks);
           if (!cover) return null;
           return (
             <Link key={id} href={`/catalog/${id}`} className="catalog-index-card">

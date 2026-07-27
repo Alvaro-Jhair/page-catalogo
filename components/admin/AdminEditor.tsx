@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { Block } from "@/data/schema";
+import type { Block, CatalogTheme } from "@/data/schema";
 import BlockList, { type EditableBlock } from "./BlockList";
 import AddColorwayForm from "./AddColorwayForm";
 import PreviewOverlay from "./PreviewOverlay";
+import ThemeEditor from "./fields/ThemeEditor";
 import { saveCatalogAction } from "@/app/admin/actions";
 
 const BLOCK_TYPES: Block["type"][] = [
@@ -74,14 +75,16 @@ function makeKey(): string {
 
 type AdminEditorProps = {
   initialBlocks: Block[];
+  initialTheme: CatalogTheme;
 };
 
 type SaveResult = Awaited<ReturnType<typeof saveCatalogAction>>;
 
-export default function AdminEditor({ initialBlocks }: AdminEditorProps) {
+export default function AdminEditor({ initialBlocks, initialTheme }: AdminEditorProps) {
   const [items, setItems] = useState<EditableBlock[]>(() =>
     initialBlocks.map((block) => ({ key: makeKey(), block }))
   );
+  const [theme, setTheme] = useState<CatalogTheme>(initialTheme);
   const [newType, setNewType] = useState<Block["type"]>("productDetail");
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<SaveResult | null>(null);
@@ -104,13 +107,18 @@ export default function AdminEditor({ initialBlocks }: AdminEditorProps) {
   const handleSave = () => {
     setResult(null);
     startTransition(async () => {
-      const res = await saveCatalogAction(items.map((item) => item.block));
+      const res = await saveCatalogAction(
+        theme,
+        items.map((item) => item.block)
+      );
       setResult(res);
     });
   };
 
   return (
     <>
+      <ThemeEditor theme={theme} onChange={setTheme} />
+
       <BlockList items={items} onChange={setItems} />
 
       <AddColorwayForm
@@ -171,6 +179,7 @@ export default function AdminEditor({ initialBlocks }: AdminEditorProps) {
       {previewOpen && (
         <PreviewOverlay
           blocks={items.map((item) => item.block)}
+          theme={theme}
           onClose={() => setPreviewOpen(false)}
         />
       )}

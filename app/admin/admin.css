@@ -317,6 +317,54 @@ button.admin-block-title {
   font-size: 0.9rem;
 }
 
+/* ---- theme editor ---- */
+
+.admin-theme-editor {
+  padding: 14px;
+  margin-bottom: 20px;
+  background: #fff;
+  border: 1px solid #e2e2df;
+  border-radius: 8px;
+}
+
+.admin-theme-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.admin-theme-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-theme-color input[type="color"] {
+  width: 34px;
+  height: 34px;
+  padding: 2px;
+  border: 1px solid #d5d5d0;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+.admin-theme-color label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.admin-theme-fonts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.admin-theme-fonts .admin-field {
+  flex: 1 1 200px;
+}
+
 /* ---- add colorway (template) ---- */
 
 .admin-add-colorway {

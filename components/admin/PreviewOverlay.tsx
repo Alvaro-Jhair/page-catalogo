@@ -3,10 +3,11 @@
 import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
 import CatalogRenderer from "@/components/catalog/CatalogRenderer";
-import type { Block } from "@/data/schema";
+import type { Block, CatalogTheme } from "@/data/schema";
 
 type PreviewOverlayProps = {
   blocks: Block[];
+  theme: CatalogTheme;
   onClose: () => void;
 };
 
@@ -18,7 +19,7 @@ type PreviewOverlayProps = {
  * <main> anidado y que el scroll-snap del catálogo compita con el
  * layout del admin).
  */
-export default function PreviewOverlay({ blocks, onClose }: PreviewOverlayProps) {
+export default function PreviewOverlay({ blocks, theme, onClose }: PreviewOverlayProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function PreviewOverlay({ blocks, onClose }: PreviewOverlayProps)
       <button type="button" className="admin-preview-close" onClick={onClose}>
         ✕ Cerrar vista previa
       </button>
-      <CatalogRenderer blocks={withPageNumbers} />
+      <CatalogRenderer blocks={withPageNumbers} theme={theme} />
     </div>,
     document.body
   );

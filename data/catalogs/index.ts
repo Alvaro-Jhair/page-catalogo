@@ -2,11 +2,11 @@
 // acá por id, nunca importar el contenido de una colección específica
 // directamente en app/ o components/.
 
-import { catalogBlocks as arielBlocks } from "./ariel";
-import type { CatalogBlocks } from "../schema";
+import { catalogEntry as arielEntry } from "./ariel";
+import type { CatalogEntry } from "../schema";
 
 export const catalogs = {
-  ariel: arielBlocks,
-} satisfies Record<string, CatalogBlocks>;
+  ariel: arielEntry,
+} satisfies Record<string, CatalogEntry>;
 
 export type CatalogId = keyof typeof catalogs;

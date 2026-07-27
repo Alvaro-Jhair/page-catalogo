@@ -18,9 +18,9 @@ export default async function CatalogPage({ params }: CatalogPageProps) {
     notFound();
   }
 
-  const blocks = catalogs[id as CatalogId];
+  const entry = catalogs[id as CatalogId];
 
-  return <CatalogRenderer blocks={blocks} pdfHref={`/catalog-${id}.pdf`} />;
+  return <CatalogRenderer blocks={entry.blocks} theme={entry.theme} pdfHref={`/catalog-${id}.pdf`} />;
 }
 
 export function generateStaticParams() {

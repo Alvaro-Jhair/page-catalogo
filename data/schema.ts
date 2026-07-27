@@ -101,3 +101,28 @@ export type Block = z.infer<typeof BlockSchema>;
 
 export const CatalogBlocksSchema = z.array(BlockSchema);
 export type CatalogBlocks = z.infer<typeof CatalogBlocksSchema>;
+
+// ---- Theme: per-catalog visual identity ----
+//
+// Maps 1:1 onto the CSS custom properties already used sitewide
+// (app/globals.css `:root`) plus the two font stacks used for the
+// serif "hero moment" titles vs. everything else — free colors/fonts,
+// not a fixed set of presets, applied by CatalogRenderer as inline
+// CSS variables scoped to that catalog's render root.
+
+export const CatalogThemeSchema = z.object({
+  ink: z.string().min(1),
+  paper: z.string().min(1),
+  line: z.string().min(1),
+  muted: z.string().min(1),
+  accent: z.string().min(1),
+  displayFont: z.string().min(1),
+  bodyFont: z.string().min(1),
+});
+export type CatalogTheme = z.infer<typeof CatalogThemeSchema>;
+
+export const CatalogEntrySchema = z.object({
+  theme: CatalogThemeSchema,
+  blocks: CatalogBlocksSchema,
+});
+export type CatalogEntry = z.infer<typeof CatalogEntrySchema>;
