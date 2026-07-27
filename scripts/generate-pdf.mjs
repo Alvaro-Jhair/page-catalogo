@@ -70,77 +70,71 @@ async function waitForServer(url, timeoutMs = 30000) {
   throw new Error(`Timed out waiting for ${url}`);
 }
 
-async function printCatalog(browser, catalogId) {
+async function printCatalog(page, catalogId) {
   const catalogUrl = `${BASE_URL}/catalog/${catalogId}`;
   const outputPath = path.join(rootDir, "public", `catalog-${catalogId}.pdf`);
-  const viewportWidth = parseInt(PAGE_WIDTH, 10);
   const viewportHeight = parseInt(PAGE_HEIGHT, 10);
 
-  const page = await browser.newPage({ viewport: { width: viewportWidth, height: viewportHeight } });
-  try {
-    await page.goto(catalogUrl, { waitUntil: "networkidle" });
+  await page.goto(catalogUrl, { waitUntil: "networkidle" });
 
-    // El catálogo usa IntersectionObserver (RevealOnScroll) y lazy
-    // loading nativo de next/image: ambos solo se disparan cuando el
-    // contenido realmente entra en el viewport durante un scroll.
-    // page.pdf() no hace scroll de verdad, así que sin este paso todo
-    // lo que está debajo del primer tramo queda invisible o sin
-    // cargar en el PDF (la portada se salva porque fuerza su propio
-    // "visible" de entrada; el resto no).
-    console.log(`[generate-pdf] (${catalogId}) scrolling through the page to trigger lazy content...`);
-    const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
-    for (let y = 0; y < scrollHeight; y += viewportHeight) {
-      await page.evaluate((y) => window.scrollTo(0, y), y);
-      await page.waitForLoadState("networkidle");
-      await sleep(200); // margen para que corra la transición de RevealOnScroll
-    }
-    // El loop de arriba avanza en pasos fijos de un viewport, así que
-    // puede quedarse corto respecto al final real de la página si la
-    // altura total no es un múltiplo exacto — dejando la última sección
-    // sin disparar su observer. Se re-mide scrollHeight (puede haber
-    // crecido con el contenido ya cargado) y se fuerza un scroll
-    // explícito hasta ahí.
-    const finalScrollHeight = await page.evaluate(() => document.body.scrollHeight);
-    await page.evaluate((y) => window.scrollTo(0, y), finalScrollHeight);
+  // El catálogo usa IntersectionObserver (RevealOnScroll) y lazy
+  // loading nativo de next/image: ambos solo se disparan cuando el
+  // contenido realmente entra en el viewport durante un scroll.
+  // page.pdf() no hace scroll de verdad, así que sin este paso todo
+  // lo que está debajo del primer tramo queda invisible o sin
+  // cargar en el PDF (la portada se salva porque fuerza su propio
+  // "visible" de entrada; el resto no).
+  console.log(`[generate-pdf] (${catalogId}) scrolling through the page to trigger lazy content...`);
+  const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
+  for (let y = 0; y < scrollHeight; y += viewportHeight) {
+    await page.evaluate((y) => window.scrollTo(0, y), y);
     await page.waitForLoadState("networkidle");
-    await sleep(300);
-
-    // No confiar solo en los sleep() de arriba: en un build real de
-    // Vercel (más lento/limitado que una máquina local) dos páginas
-    // completas salieron negras —imagen de fondo y texto ausentes—
-    // porque el margen fijo no alcanzó a cubrir la carga+decode de fotos
-    // de 1.5-2.6MB. Se espera explícitamente a que toda imagen haya
-    // terminado de cargar y todo bloque RevealOnScroll esté marcado
-    // visible, con un timeout generoso en vez de una espera a ciegas.
-    console.log(`[generate-pdf] (${catalogId}) waiting for every image and reveal block to finish...`);
-    await page.waitForFunction(
-      () => {
-        const images = Array.from(document.querySelectorAll("img"));
-        const imagesReady = images.every((img) => img.complete && img.naturalWidth > 0);
-        const reveals = Array.from(document.querySelectorAll(".reveal"));
-        const revealsReady = reveals.every((el) => el.classList.contains("visible"));
-        return imagesReady && revealsReady;
-      },
-      { timeout: 30000 }
-    );
-
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await sleep(200);
-
-    await page.emulateMedia({ media: "print" });
-
-    await page.pdf({
-      path: outputPath,
-      width: PAGE_WIDTH,
-      height: PAGE_HEIGHT,
-      printBackground: true,
-      margin: { top: "0", right: "0", bottom: "0", left: "0" },
-    });
-
-    console.log(`[generate-pdf] wrote ${path.relative(rootDir, outputPath)}`);
-  } finally {
-    await page.close();
+    await sleep(200); // margen para que corra la transición de RevealOnScroll
   }
+  // El loop de arriba avanza en pasos fijos de un viewport, así que
+  // puede quedarse corto respecto al final real de la página si la
+  // altura total no es un múltiplo exacto — dejando la última sección
+  // sin disparar su observer. Se re-mide scrollHeight (puede haber
+  // crecido con el contenido ya cargado) y se fuerza un scroll
+  // explícito hasta ahí.
+  const finalScrollHeight = await page.evaluate(() => document.body.scrollHeight);
+  await page.evaluate((y) => window.scrollTo(0, y), finalScrollHeight);
+  await page.waitForLoadState("networkidle");
+  await sleep(300);
+
+  // No confiar solo en los sleep() de arriba: en un build real de
+  // Vercel (más lento/limitado que una máquina local) dos páginas
+  // completas salieron negras —imagen de fondo y texto ausentes—
+  // porque el margen fijo no alcanzó a cubrir la carga+decode de fotos
+  // de 1.5-2.6MB. Se espera explícitamente a que toda imagen haya
+  // terminado de cargar y todo bloque RevealOnScroll esté marcado
+  // visible, con un timeout generoso en vez de una espera a ciegas.
+  console.log(`[generate-pdf] (${catalogId}) waiting for every image and reveal block to finish...`);
+  await page.waitForFunction(
+    () => {
+      const images = Array.from(document.querySelectorAll("img"));
+      const imagesReady = images.every((img) => img.complete && img.naturalWidth > 0);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const revealsReady = reveals.every((el) => el.classList.contains("visible"));
+      return imagesReady && revealsReady;
+    },
+    { timeout: 30000 }
+  );
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(200);
+
+  await page.emulateMedia({ media: "print" });
+
+  await page.pdf({
+    path: outputPath,
+    width: PAGE_WIDTH,
+    height: PAGE_HEIGHT,
+    printBackground: true,
+    margin: { top: "0", right: "0", bottom: "0", left: "0" },
+  });
+
+  console.log(`[generate-pdf] wrote ${path.relative(rootDir, outputPath)}`);
 }
 
 async function main() {
@@ -158,9 +152,21 @@ async function main() {
 
     browser = await launchBrowser();
 
+    // Una sola página, reutilizada (navegada de catálogo en catálogo)
+    // en vez de una `newPage()` por catálogo: el Chromium que corre en
+    // Vercel (@sparticuz/chromium) va con `--single-process`, que no
+    // tolera abrir una página nueva después de cerrar otra — confirmado
+    // en un build real, donde el segundo catálogo crasheaba con
+    // "Target page, context or browser has been closed" apenas
+    // arrancaba. Con una sola página que solo navega, ese modo nunca
+    // se pone a prueba.
+    const viewportWidth = parseInt(PAGE_WIDTH, 10);
+    const viewportHeight = parseInt(PAGE_HEIGHT, 10);
+    const page = await browser.newPage({ viewport: { width: viewportWidth, height: viewportHeight } });
+
     const catalogIds = getCatalogIds();
     for (const catalogId of catalogIds) {
-      await printCatalog(browser, catalogId);
+      await printCatalog(page, catalogId);
     }
   } finally {
     if (browser) await browser.close();
