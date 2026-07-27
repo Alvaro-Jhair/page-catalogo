@@ -215,17 +215,41 @@
   border-color: #222;
 }
 
-.admin-template-card-swatches {
-  display: flex;
-  gap: 4px;
+.admin-template-thumb-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ddd;
 }
 
-.admin-template-card-swatches span {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  flex-shrink: 0;
+.admin-template-thumb-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.admin-template-thumb-title {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 22px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.admin-template-thumb-tag {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .admin-template-card-title {

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { createCatalogAction } from "@/app/admin/actions";
 import { CATALOG_TEMPLATES } from "@/lib/newCatalog";
+import TemplateThumb from "./TemplateThumb";
 
 /**
  * Crea un catálogo nuevo desde cero (contenido inicial armado por
@@ -48,13 +49,7 @@ export default function AddCatalogForm() {
             className={`admin-template-card${template.id === templateId ? " selected" : ""}`}
             onClick={() => setTemplateId(template.id)}
           >
-            <div className="admin-template-card-swatches">
-              {[template.theme.ink, template.theme.paper, template.theme.line, template.theme.muted, template.theme.accent].map(
-                (color, i) => (
-                  <span key={i} style={{ background: color }} />
-                )
-              )}
-            </div>
+            <TemplateThumb template={template} />
             <p className="admin-template-card-title">{template.label}</p>
             <p className="admin-template-card-description">{template.description}</p>
           </button>
