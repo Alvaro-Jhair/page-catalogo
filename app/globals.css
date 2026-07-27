@@ -430,6 +430,16 @@ a {
   padding: 60px 24px;
 }
 
+/* .page-overlay is position:absolute, which puts it in a later paint
+   step than normal in-flow content regardless of DOM order — without
+   this it visually sits under the text (translucent) but still
+   intercepts clicks on top of the download link. Same fix already
+   applied to .chapter .product-name for the same reason. */
+.closing .reveal {
+  position: relative;
+  z-index: 2;
+}
+
 .closing h2 {
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(3.2rem, 8vw, 7.4rem);
