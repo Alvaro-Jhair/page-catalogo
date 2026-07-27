@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { catalogs } from "@/data/catalogs";
 import type { Block, CatalogBlocks } from "@/data/schema";
 import LogoutButton from "@/components/admin/LogoutButton";
 import AddCatalogForm from "@/components/admin/AddCatalogForm";
+import CatalogList from "@/components/admin/CatalogList";
 
 function getCoverBlock(blocks: CatalogBlocks) {
   return blocks.find((b): b is Extract<Block, { type: "cover" }> => b.type === "cover");
@@ -13,12 +13,16 @@ function getCoverBlock(blocks: CatalogBlocks) {
  * Índice de catálogos del panel: uno por entrada del registro
  * (data/catalogs/index.ts), cada uno linkeando a su propio editor en
  * /admin/[id] — antes /admin era directamente el editor de Ariel, el
- * único catálogo que existía; ahora que el panel puede crear más, hace
- * falta un punto de entrada que liste todos.
+ * único catálogo que existía; ahora que el panel puede crear/eliminar
+ * más, hace falta un punto de entrada que liste todos.
  */
 export default async function AdminPage() {
   await requireSession();
-  const entries = Object.entries(catalogs);
+  const items = Object.entries(catalogs).map(([id, entry]) => ({
+    id,
+    title: getCoverBlock(entry.blocks)?.data.title || id,
+    blockCount: entry.blocks.length,
+  }));
 
   return (
     <>
@@ -29,20 +33,7 @@ export default async function AdminPage() {
         </div>
       </header>
       <main className="admin-main">
-        <div className="admin-catalog-list">
-          {entries.map(([id, entry]) => {
-            const cover = getCoverBlock(entry.blocks);
-            return (
-              <Link key={id} href={`/admin/${id}`} className="admin-catalog-card">
-                <span className="admin-catalog-card-title">{cover?.data.title || id}</span>
-                <span className="admin-catalog-card-meta">
-                  {id} · {entry.blocks.length} bloques
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-
+        <CatalogList catalogs={items} />
         <AddCatalogForm />
       </main>
     </>

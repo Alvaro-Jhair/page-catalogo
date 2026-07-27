@@ -1,32 +1,33 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { createCatalogAction } from "@/app/admin/actions";
 
 /**
  * Crea un catálogo nuevo desde cero (contenido inicial armado por
- * lib/newCatalog.ts) y, si el commit sale bien, navega directo a su
- * editor — el catálogo recién creado tarda lo que tarda el redeploy de
- * Vercel en aparecer en el sitio público, pero ya es editable en
- * /admin/<id> apenas el commit se hizo (esa ruta lee del registro
- * compilado, así que no estará disponible hasta el próximo build; el
- * mensaje de éxito lo aclara).
+ * lib/newCatalog.ts). A propósito NO navega a /admin/<id> apenas
+ * termina: ese id todavía no existe en el registro que está corriendo
+ * este mismo servidor — recién va a estar ahí cuando Vercel termine de
+ * redesplegar a partir del commit que se acaba de crear (~1 minuto), y
+ * un push inmediato caía en un 404/página equivocada por esa carrera.
+ * En cambio queda un mensaje de éxito con el link directo para cuando
+ * ya esté listo.
  */
 export default function AddCatalogForm() {
   const [name, setName] = useState("");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [created, setCreated] = useState<{ id: string; commitUrl: string } | null>(null);
 
   const handleCreate = () => {
     if (!name.trim()) return;
     setError(null);
+    setCreated(null);
     startTransition(async () => {
       const res = await createCatalogAction(name);
       if (res.ok) {
         setName("");
-        router.push(`/admin/${res.id}`);
+        setCreated({ id: res.id, commitUrl: res.commitUrl });
       } else {
         setError(res.error);
       }
@@ -49,9 +50,18 @@ export default function AddCatalogForm() {
       </div>
       <p className="admin-image-picker-note">
         Arranca con una estructura completa (portada, manifiesto, dos colorways, cierre) para editar encima — no
-        queda visible en el sitio público hasta que Vercel termine de redesplegar.
+        queda disponible para editar ni visible en el sitio hasta que Vercel termine de redesplegar.
       </p>
       {error && <p className="admin-save-message error">{error}</p>}
+      {created && (
+        <p className="admin-save-message ok">
+          Catálogo &ldquo;{created.id}&rdquo; creado (
+          <a href={created.commitUrl} target="_blank" rel="noreferrer">
+            ver commit
+          </a>
+          ). En cuanto termine el redeploy vas a poder editarlo en <code>/admin/{created.id}</code>.
+        </p>
+      )}
     </div>
   );
 }

@@ -1,7 +1,14 @@
 "use server";
 
 import { requireSession } from "@/lib/session";
-import { saveCatalog, createCatalog, type SaveCatalogResult, type CreateCatalogResult } from "@/lib/catalogStore";
+import {
+  saveCatalog,
+  createCatalog,
+  deleteCatalog,
+  type SaveCatalogResult,
+  type CreateCatalogResult,
+  type DeleteCatalogResult,
+} from "@/lib/catalogStore";
 import { uploadAsset, type UploadAssetResult } from "@/lib/assets";
 import type { Block, CatalogTheme } from "@/data/schema";
 
@@ -31,6 +38,11 @@ export async function saveCatalogAction(
 export async function createCatalogAction(name: string): Promise<CreateCatalogResult> {
   await requireSession();
   return createCatalog(name);
+}
+
+export async function deleteCatalogAction(id: string): Promise<DeleteCatalogResult> {
+  await requireSession();
+  return deleteCatalog(id);
 }
 
 export async function uploadAssetAction(

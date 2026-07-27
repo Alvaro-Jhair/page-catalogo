@@ -43,7 +43,8 @@ async function githubRequest(path: string, token: string, init?: RequestInit) {
 }
 
 export type CommitFileResult = { commitUrl: string };
-export type CommitFileInput = { path: string; base64Content: string };
+/** `base64Content: null` borra ese path del repo en vez de crearlo/reemplazarlo. */
+export type CommitFileInput = { path: string; base64Content: string | null };
 
 /**
  * Comitea uno o más archivos (texto o binario) al repo en un solo
@@ -52,11 +53,13 @@ export type CommitFileInput = { path: string; base64Content: string };
  * por archivo, y las fotos reales de este catálogo pesan 1.5-2.6MB. La
  * Git Data API no tiene ese techo, y sirve igual de bien para el JSON
  * (chico) de un catálogo, así que todo el proyecto comitea por este
- * único camino. Crear un catálogo nuevo necesita 3 archivos a la vez
+ * único camino. Crear (o borrar) un catálogo toca 3 archivos a la vez
  * (su JSON, su loader .ts, y el registro actualizado) — de ahí que esto
- * acepte una lista en vez de un solo archivo: son 3 blobs pero un único
- * tree/commit, así que nunca queda el repo con solo 2 de los 3 creados
- * a medio camino si algo falla.
+ * acepte una lista en vez de un solo archivo: son varios blobs pero un
+ * único tree/commit, así que nunca queda el repo a medio camino si algo
+ * falla. `base64Content: null` en un archivo lo borra del repo en vez
+ * de crearlo/reemplazarlo (así es como borrar un catálogo saca su JSON
+ * y su loader del árbol en el mismo commit que regenera el registro).
  *
  * Nota: cada llamada mueve la rama a un commit nuevo basado en el HEAD
  * *en ese momento* — dos llamadas concurrentes podrían pisarse. Alcance
@@ -70,15 +73,19 @@ export async function commitFiles(
 ): Promise<CommitFileResult> {
   const { token, repo, branch } = getGitHubConfig();
 
-  // 1. Un blob por archivo con su contenido nuevo.
+  // 1. Un blob por archivo con contenido nuevo — los que se borran
+  // (base64Content: null) no necesitan blob, van directo al tree con
+  // sha: null, que es como la Git Data API marca "sacar este path".
+  const toCreate = files.filter((f) => f.base64Content !== null);
   const blobs = await Promise.all(
-    files.map((file) =>
+    toCreate.map((file) =>
       githubRequest(`/repos/${repo}/git/blobs`, token, {
         method: "POST",
         body: JSON.stringify({ content: file.base64Content, encoding: "base64" }),
       })
     )
   );
+  const blobShaByPath = new Map(toCreate.map((file, i) => [file.path, blobs[i].sha]));
 
   // 2. HEAD actual de la rama -> su commit -> el tree base sobre el que construir.
   const ref = await githubRequest(`/repos/${repo}/git/ref/heads/${branch}`, token);
@@ -86,16 +93,16 @@ export async function commitFiles(
   const baseCommit = await githubRequest(`/repos/${repo}/git/commits/${baseCommitSha}`, token);
   const baseTreeSha = baseCommit.tree.sha;
 
-  // 3. Tree nuevo: el base más estos archivos (agregados o reemplazados).
+  // 3. Tree nuevo: el base más estos archivos (agregados, reemplazados o borrados).
   const tree = await githubRequest(`/repos/${repo}/git/trees`, token, {
     method: "POST",
     body: JSON.stringify({
       base_tree: baseTreeSha,
-      tree: files.map((file, i) => ({
+      tree: files.map((file) => ({
         path: file.path,
         mode: "100644",
         type: "blob",
-        sha: blobs[i].sha,
+        sha: file.base64Content === null ? null : blobShaByPath.get(file.path),
       })),
     }),
   });

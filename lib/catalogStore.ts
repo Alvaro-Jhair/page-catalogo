@@ -12,6 +12,10 @@ export type CreateCatalogResult =
   | { ok: true; id: string; commitUrl: string }
   | { ok: false; error: string };
 
+export type DeleteCatalogResult =
+  | { ok: true; commitUrl: string }
+  | { ok: false; error: string };
+
 /** Ruta del archivo de datos de un catálogo dentro del repo. */
 export function catalogFilePath(catalogId: string): string {
   return `data/catalogs/${catalogId}.json`;
@@ -102,6 +106,43 @@ export async function createCatalog(name: string): Promise<CreateCatalogResult> 
     return {
       ok: false,
       error: err instanceof Error ? err.message : "Error desconocido al crear el catálogo.",
+    };
+  }
+}
+
+/**
+ * Elimina un catálogo: borra su JSON y su loader .ts, y regenera
+ * `data/catalogs/index.ts` sin su id — mismo commit atómico que
+ * `createCatalog`, en la dirección contraria. Nunca deja el registro
+ * apuntando a un catálogo que ya no existe (eso rompería el build
+ * entero, no solo ese catálogo), así que valida el id contra el
+ * registro actual antes de tocar nada, y rechaza dejar el sitio sin
+ * ningún catálogo.
+ */
+export async function deleteCatalog(id: string): Promise<DeleteCatalogResult> {
+  if (!(id in catalogs)) {
+    return { ok: false, error: `No existe un catálogo con el id "${id}".` };
+  }
+
+  const remainingIds = Object.keys(catalogs).filter((existingId) => existingId !== id);
+  if (remainingIds.length === 0) {
+    return { ok: false, error: "No se puede eliminar el único catálogo que queda." };
+  }
+
+  try {
+    const { commitUrl } = await commitFiles(
+      [
+        { path: catalogFilePath(id), base64Content: null },
+        { path: `data/catalogs/${id}.ts`, base64Content: null },
+        { path: `data/catalogs/index.ts`, base64Content: toBase64(registryIndexSource(remainingIds)) },
+      ],
+      `catalog(${id}): eliminar catálogo desde el panel de administración`
+    );
+    return { ok: true, commitUrl };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Error desconocido al eliminar el catálogo.",
     };
   }
 }
