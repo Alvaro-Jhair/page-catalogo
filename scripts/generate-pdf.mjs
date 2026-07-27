@@ -6,6 +6,7 @@
 // Corre como último paso de `npm run build`: levanta un `next start`
 // efímero contra el build recién generado, imprime, y lo apaga.
 import { chromium } from "playwright";
+import vercelChromium from "@sparticuz/chromium";
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import path from "node:path";
@@ -31,6 +32,25 @@ const OUTPUT_PATH = path.join(rootDir, "public", `catalog-${CATALOG_ID}.pdf`);
 // (100svh) se imprime como una página física de este tamaño.
 const PAGE_WIDTH = "1080px";
 const PAGE_HEIGHT = "1440px";
+
+// El Chromium que baja `playwright install chromium` no arranca en el
+// contenedor de build de Vercel: le faltan librerías del sistema
+// (confirmado en un build real: "chrome-headless-shell: error while
+// loading shared libraries: libnspr4.so"). @sparticuz/chromium empaqueta
+// un binario compilado estáticamente justo para este tipo de entorno
+// (Lambda/Vercel), así que en Vercel lanzamos ese binario en vez del que
+// Playwright descargó; en cualquier otro lado (local, otro CI) seguimos
+// usando el Chromium propio de Playwright, que sí corre normalmente.
+async function launchBrowser() {
+  if (!process.env.VERCEL) {
+    return chromium.launch();
+  }
+  return chromium.launch({
+    args: vercelChromium.args,
+    executablePath: await vercelChromium.executablePath(),
+    headless: true,
+  });
+}
 
 async function waitForServer(url, timeoutMs = 30000) {
   const start = Date.now();
@@ -59,7 +79,7 @@ async function main() {
     await waitForServer(BASE_URL);
     console.log("[generate-pdf] server ready, launching headless browser...");
 
-    browser = await chromium.launch();
+    browser = await launchBrowser();
     const viewportWidth = parseInt(PAGE_WIDTH, 10);
     const viewportHeight = parseInt(PAGE_HEIGHT, 10);
     const page = await browser.newPage({ viewport: { width: viewportWidth, height: viewportHeight } });
