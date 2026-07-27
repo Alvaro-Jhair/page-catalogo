@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { Block } from "@/data/schema";
 import BlockForm from "./BlockForm";
 
@@ -73,69 +73,133 @@ export default function BlockList({ items, onChange }: BlockListProps) {
     onChange(items.map((item, idx) => (idx === i ? { ...item, block } : item)));
   };
 
+  // Mueve el par [capítulo, detalle] que arranca en `startIndex` una
+  // posición entera hacia arriba/abajo, en vez de mover cada bloque por
+  // separado — así reordenar un colorway completo es 1 clic en vez de 2.
+  const moveGroupUp = (startIndex: number) => {
+    if (startIndex === 0) return;
+    const next = [...items];
+    const pair = next.splice(startIndex, 2);
+    next.splice(startIndex - 1, 0, ...pair);
+    onChange(next);
+  };
+
+  const moveGroupDown = (startIndex: number) => {
+    if (startIndex + 2 >= items.length) return;
+    const next = [...items];
+    const pair = next.splice(startIndex, 2);
+    next.splice(startIndex + 1, 0, ...pair);
+    onChange(next);
+  };
+
   if (items.length === 0) {
     return <p>Este catálogo no tiene bloques todavía. Agregá uno abajo.</p>;
   }
 
-  return (
-    <div className="admin-block-list">
-      {items.map((item, i) => {
-        const isOpen = expandedKey === item.key;
-        return (
-          <div className="admin-block" key={item.key}>
-            <div className="admin-block-summary">
-              <span className="admin-block-tag">{TYPE_LABELS[item.block.type]}</span>
+  function renderCard(item: EditableBlock, i: number) {
+    const isOpen = expandedKey === item.key;
+    return (
+      <div className="admin-block" key={item.key}>
+        <div className="admin-block-summary">
+          <span className="admin-block-tag">{TYPE_LABELS[item.block.type]}</span>
+          <button
+            type="button"
+            className="admin-block-title"
+            onClick={() => setExpandedKey(isOpen ? null : item.key)}
+          >
+            {blockTitle(item.block)}
+          </button>
+          <div className="admin-block-controls">
+            <button
+              type="button"
+              className="admin-btn admin-btn-icon"
+              onClick={() => moveUp(i)}
+              disabled={i === 0}
+              aria-label="Subir bloque"
+            >
+              ↑
+            </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn-icon"
+              onClick={() => moveDown(i)}
+              disabled={i === items.length - 1}
+              aria-label="Bajar bloque"
+            >
+              ↓
+            </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn-icon"
+              onClick={() => setExpandedKey(isOpen ? null : item.key)}
+            >
+              {isOpen ? "Cerrar" : "Editar"}
+            </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn-icon admin-btn-danger"
+              onClick={() => remove(i)}
+              aria-label="Quitar bloque"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+        {isOpen && (
+          <div className="admin-block-form">
+            <BlockForm block={item.block} onChange={(b) => updateBlock(i, b)} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const cards: ReactNode[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const current = items[i].block;
+    const nextItem = items[i + 1]?.block;
+    const isColorwayPair =
+      current.type === "chapterHero" &&
+      nextItem?.type === "productDetail" &&
+      current.data.id !== "" &&
+      current.data.id === nextItem.data.id;
+
+    if (isColorwayPair) {
+      cards.push(
+        <div className="admin-colorway-group" key={`group-${items[i].key}`}>
+          <div className="admin-colorway-group-header">
+            <span>Colorway: {current.data.label || current.data.name || "(sin nombre)"}</span>
+            <div className="admin-block-controls">
               <button
                 type="button"
-                className="admin-block-title"
-                onClick={() => setExpandedKey(isOpen ? null : item.key)}
+                className="admin-btn admin-btn-icon"
+                onClick={() => moveGroupUp(i)}
+                disabled={i === 0}
+                aria-label="Subir colorway completo"
               >
-                {blockTitle(item.block)}
+                ↑↑
               </button>
-              <div className="admin-block-controls">
-                <button
-                  type="button"
-                  className="admin-btn admin-btn-icon"
-                  onClick={() => moveUp(i)}
-                  disabled={i === 0}
-                  aria-label="Subir bloque"
-                >
-                  ↑
-                </button>
-                <button
-                  type="button"
-                  className="admin-btn admin-btn-icon"
-                  onClick={() => moveDown(i)}
-                  disabled={i === items.length - 1}
-                  aria-label="Bajar bloque"
-                >
-                  ↓
-                </button>
-                <button
-                  type="button"
-                  className="admin-btn admin-btn-icon"
-                  onClick={() => setExpandedKey(isOpen ? null : item.key)}
-                >
-                  {isOpen ? "Cerrar" : "Editar"}
-                </button>
-                <button
-                  type="button"
-                  className="admin-btn admin-btn-icon admin-btn-danger"
-                  onClick={() => remove(i)}
-                  aria-label="Quitar bloque"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                type="button"
+                className="admin-btn admin-btn-icon"
+                onClick={() => moveGroupDown(i)}
+                disabled={i + 2 >= items.length}
+                aria-label="Bajar colorway completo"
+              >
+                ↓↓
+              </button>
             </div>
-            {isOpen && (
-              <div className="admin-block-form">
-                <BlockForm block={item.block} onChange={(b) => updateBlock(i, b)} />
-              </div>
-            )}
           </div>
-        );
-      })}
-    </div>
-  );
+          {renderCard(items[i], i)}
+          {renderCard(items[i + 1], i + 1)}
+        </div>
+      );
+      i++; // ya se renderizó el par completo, saltar el segundo bloque
+      continue;
+    }
+
+    cards.push(renderCard(items[i], i));
+  }
+
+  return <div className="admin-block-list">{cards}</div>;
 }

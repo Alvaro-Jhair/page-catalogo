@@ -14,7 +14,11 @@ type BlockFormProps = {
   onChange: (block: Block) => void;
 };
 
-const COLLAGE_LAYOUTS = ["four", "three", "two"] as const;
+const COLLAGE_LAYOUTS = [
+  { value: "four", label: "4 fotos" },
+  { value: "three", label: "3 fotos" },
+  { value: "two", label: "2 fotos" },
+] as const;
 
 /**
  * Un formulario por tipo de bloque, con los campos que ese tipo
@@ -61,7 +65,12 @@ export default function BlockForm({ block, onChange }: BlockFormProps) {
       const set = (patch: Partial<typeof data>) => onChange({ ...block, data: { ...data, ...patch } });
       return (
         <>
-          <TextField label="Id (ancla)" value={data.id} onChange={(v) => set({ id: v })} />
+          <TextField
+            label="Identificador interno (vincula capítulo y detalle, no se edita)"
+            value={data.id}
+            onChange={(v) => set({ id: v })}
+            disabled
+          />
           <TextField label="Nombre" value={data.name} onChange={(v) => set({ name: v })} />
           <TextField label="Tipo" value={data.type} onChange={(v) => set({ type: v })} />
           <ImagePicker label="Imagen de fondo" value={data.bgImage} onChange={(v) => set({ bgImage: v })} />
@@ -74,7 +83,12 @@ export default function BlockForm({ block, onChange }: BlockFormProps) {
       const set = (patch: Partial<typeof data>) => onChange({ ...block, data: { ...data, ...patch } });
       return (
         <>
-          <TextField label="Id (ancla)" value={data.id} onChange={(v) => set({ id: v })} />
+          <TextField
+            label="Identificador interno (vincula capítulo y detalle, no se edita)"
+            value={data.id}
+            onChange={(v) => set({ id: v })}
+            disabled
+          />
           <TextField label="Nombre" value={data.name} onChange={(v) => set({ name: v })} />
           <TextField label="Etiqueta (colorway)" value={data.label} onChange={(v) => set({ label: v })} />
           <ImagePicker label="Imagen de fondo" value={data.bgImage} onChange={(v) => set({ bgImage: v })} />
@@ -87,23 +101,37 @@ export default function BlockForm({ block, onChange }: BlockFormProps) {
       const set = (patch: Partial<typeof data>) => onChange({ ...block, data: { ...data, ...patch } });
       return (
         <>
-          <TextField label="Id (ancla)" value={data.id} onChange={(v) => set({ id: v })} />
-          <TextField label="Nombre" value={data.name} onChange={(v) => set({ name: v })} />
-          <TextField label="Tipo" value={data.type} onChange={(v) => set({ type: v })} />
-          <TextField label="Precio" value={data.price} onChange={(v) => set({ price: v })} />
-          <StringListEditor
-            label="Descripción"
-            items={data.description}
-            onChange={(v) => set({ description: v })}
+          <TextField
+            label="Identificador interno (vincula capítulo y detalle, no se edita)"
+            value={data.id}
+            onChange={(v) => set({ id: v })}
+            disabled
           />
-          <SelectField
-            label="Layout del collage"
-            value={data.collageLayout}
-            options={COLLAGE_LAYOUTS}
-            onChange={(v) => set({ collageLayout: v as (typeof COLLAGE_LAYOUTS)[number] })}
-          />
-          <CollageImagesEditor images={data.collageImages} onChange={(v) => set({ collageImages: v })} />
-          <SwatchesEditor swatches={data.swatches} onChange={(v) => set({ swatches: v })} />
+          <div className="admin-field-group">
+            <h4>Contenido</h4>
+            <TextField label="Nombre" value={data.name} onChange={(v) => set({ name: v })} />
+            <TextField label="Tipo" value={data.type} onChange={(v) => set({ type: v })} />
+            <TextField label="Precio" value={data.price} onChange={(v) => set({ price: v })} />
+            <StringListEditor
+              label="Descripción"
+              items={data.description}
+              onChange={(v) => set({ description: v })}
+            />
+          </div>
+          <div className="admin-field-group">
+            <h4>Fotos</h4>
+            <SelectField
+              label="Cantidad de fotos en el collage"
+              value={data.collageLayout}
+              options={COLLAGE_LAYOUTS}
+              onChange={(v) => set({ collageLayout: v as (typeof COLLAGE_LAYOUTS)[number]["value"] })}
+            />
+            <CollageImagesEditor images={data.collageImages} onChange={(v) => set({ collageImages: v })} />
+          </div>
+          <div className="admin-field-group">
+            <h4>Colores</h4>
+            <SwatchesEditor swatches={data.swatches} onChange={(v) => set({ swatches: v })} />
+          </div>
         </>
       );
     }

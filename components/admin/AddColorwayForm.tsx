@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createColorwayBlocks } from "@/lib/templates";
 import type { Block } from "@/data/schema";
+import ImagePicker from "./ImagePicker";
 
 type AddColorwayFormProps = {
   defaultProductName: string;
@@ -66,12 +67,7 @@ export default function AddColorwayForm({
           value={productType}
           onChange={(e) => setProductType(e.target.value)}
         />
-        <input
-          type="text"
-          placeholder="/imagenes/1.png"
-          value={bgImage}
-          onChange={(e) => setBgImage(e.target.value)}
-        />
+        <ImagePicker value={bgImage} onChange={setBgImage} />
         <select value={swatchType} onChange={(e) => setSwatchType(e.target.value as "image" | "color")}>
           <option value="image">Swatch: foto</option>
           <option value="color">Swatch: color</option>

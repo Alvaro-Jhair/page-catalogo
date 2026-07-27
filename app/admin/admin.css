@@ -181,6 +181,66 @@
   font-size: 0.9rem;
 }
 
+/* ---- carrusel de plantillas ---- */
+.admin-template-carousel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+
+.admin-template-card {
+  flex: 0 0 190px;
+  scroll-snap-align: start;
+  text-align: left;
+  background: #fff;
+  border: 2px solid #e2e2df;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s ease;
+}
+
+.admin-template-card:hover {
+  border-color: #b8b8b2;
+}
+
+.admin-template-card.selected {
+  border-color: #222;
+}
+
+.admin-template-card-swatches {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-template-card-swatches span {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.admin-template-card-title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.admin-template-card-description {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #777;
+  line-height: 1.35;
+}
+
 .admin-btn {
   padding: 8px 14px;
   border-radius: 5px;
@@ -235,6 +295,34 @@
   border: 1px solid #e2e2df;
   border-radius: 8px;
   overflow: hidden;
+}
+
+/* ---- colorway groups (capítulo + detalle agrupados visualmente) ---- */
+.admin-colorway-group {
+  background: #f7f6f2;
+  border: 1px solid #e2e2df;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-colorway-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 4px 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.admin-colorway-group .admin-block {
+  border-color: #d8d8d3;
 }
 
 .admin-block-summary {
@@ -318,6 +406,35 @@ button.admin-block-title {
 .admin-field textarea {
   resize: vertical;
   min-height: 70px;
+}
+
+.admin-field input:disabled {
+  background: #f2f2ef;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* ---- field groups (agrupar campos relacionados dentro de un bloque) ---- */
+.admin-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 0 0;
+  border-top: 1px solid #ececea;
+}
+
+.admin-field-group:first-of-type {
+  padding-top: 0;
+  border-top: none;
+}
+
+.admin-field-group h4 {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #999;
 }
 
 .admin-list-editor {
@@ -460,6 +577,11 @@ button.admin-block-title {
 
 .admin-add-colorway-fields input[type="text"] {
   flex: 1 1 140px;
+  min-width: 0;
+}
+
+.admin-add-colorway-fields .admin-image-picker {
+  flex: 1 1 220px;
   min-width: 0;
 }
 
