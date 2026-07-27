@@ -6,28 +6,23 @@ type TemplateThumbProps = {
 };
 
 /**
- * Miniatura decorativa para el carrusel de "crear catálogo" — no
- * reusa CoverPage escalado (pelearía contra .page{min-height:100svh},
- * PageNumber absoluto y RevealOnScroll dentro de un cuadro minúsculo,
- * todo para algo puramente decorativo). Es un selector, como un swatch
- * de color, no una segunda implementación del renderizado real del
- * catálogo — CatalogRenderer sigue siendo el único que dibuja páginas
- * de verdad (ver PreviewOverlay).
+ * Miniatura del carrusel de "crear catálogo": capturas reales de la
+ * portada y la página de producto de la plantilla (pre-generadas, ver
+ * public/admin-previews/ y scripts/generate-template-previews.mjs),
+ * no una simulación decorativa — mismo espíritu que la hoja
+ * comparativa que se le mostró al admin para elegir entre las 10.
  */
 export default function TemplateThumb({ template }: TemplateThumbProps) {
-  const { theme, preview } = template;
+  const { preview } = template;
   return (
-    <div className="admin-template-thumb-photo">
-      <Image src={preview.image} alt="" fill sizes="170px" style={{ objectFit: "cover" }} />
-      <div
-        className="admin-template-thumb-overlay"
-        style={{ background: `linear-gradient(180deg, transparent 35%, ${theme.ink}e6 100%)` }}
-      />
-      <div className="admin-template-thumb-title" style={{ fontFamily: theme.displayFont }}>
-        {preview.title}
+    <div className="admin-template-thumb-shots">
+      <div className="admin-template-thumb-shot">
+        <Image src={preview.coverImage} alt="" fill sizes="160px" style={{ objectFit: "cover" }} />
+        <span>Portada</span>
       </div>
-      <div className="admin-template-thumb-tag" style={{ fontFamily: theme.bodyFont, color: theme.accent }}>
-        {preview.tag}
+      <div className="admin-template-thumb-shot">
+        <Image src={preview.detailImage} alt="" fill sizes="160px" style={{ objectFit: "cover" }} />
+        <span>Producto</span>
       </div>
     </div>
   );
