@@ -130,3 +130,26 @@ export async function commitFile(
 ): Promise<CommitFileResult> {
   return commitFiles([{ path, base64Content }], message);
 }
+
+/**
+ * Lista los archivos `.json` directamente dentro de `dirPath` en el
+ * HEAD *real* de la rama en GitHub — a propósito no la lista de ids que
+ * ya tiene cargado el proceso corriendo (`Object.keys(catalogs)`), que
+ * solo está tan fresca como el último deploy que terminó. Un crear y un
+ * borrar casi simultáneos (dos commits reales, un solo proceso viejo
+ * corriendo entre medio) hicieron exactamente eso una vez: el segundo
+ * commit regeneró el registro a partir de datos ya obsoletos y terminó
+ * apuntando a un catálogo que el primer commit ya había borrado,
+ * rompiendo el build. Consultar GitHub antes de regenerar el registro
+ * es lo que evita que se repita.
+ */
+export async function listRepoJsonFileIds(dirPath: string): Promise<string[]> {
+  const { token, repo, branch } = getGitHubConfig();
+  const items = await githubRequest(
+    `/repos/${repo}/contents/${dirPath}?ref=${encodeURIComponent(branch)}`,
+    token
+  );
+  return items
+    .filter((item: { type: string; name: string }) => item.type === "file" && item.name.endsWith(".json"))
+    .map((item: { name: string }) => item.name.replace(/\.json$/, ""));
+}

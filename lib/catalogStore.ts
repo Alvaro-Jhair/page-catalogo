@@ -1,8 +1,9 @@
 import "server-only";
 import { CatalogEntrySchema, type CatalogEntry } from "@/data/schema";
-import { catalogs } from "@/data/catalogs";
-import { commitFile, commitFiles } from "./github";
+import { commitFile, commitFiles, listRepoJsonFileIds } from "./github";
 import { createStarterCatalog } from "./newCatalog";
+
+const CATALOGS_DIR = "data/catalogs";
 
 export type SaveCatalogResult =
   | { ok: true; commitUrl: string }
@@ -78,10 +79,6 @@ export async function createCatalog(name: string): Promise<CreateCatalogResult> 
 
   const { id, entry } = createStarterCatalog(trimmed);
 
-  if (id in catalogs) {
-    return { ok: false, error: `Ya existe un catálogo con el id "${id}".` };
-  }
-
   const parsed = CatalogEntrySchema.safeParse(entry);
   if (!parsed.success) {
     // No debería pasar nunca en la práctica (el contenido lo arma
@@ -90,9 +87,18 @@ export async function createCatalog(name: string): Promise<CreateCatalogResult> 
     return { ok: false, error: "El contenido inicial no calza con el modelo de datos del catálogo." };
   }
 
-  const allIds = [...Object.keys(catalogs), id];
-
   try {
+    // La lista de ids se pide en vivo a GitHub, no del registro que ya
+    // tiene cargado este proceso — ese solo está tan fresco como el
+    // último deploy que terminó, y regenerar el registro a partir de
+    // datos viejos ya rompió un build una vez (ver nota en
+    // listRepoJsonFileIds).
+    const existingIds = await listRepoJsonFileIds(CATALOGS_DIR);
+    if (existingIds.includes(id)) {
+      return { ok: false, error: `Ya existe un catálogo con el id "${id}".` };
+    }
+    const allIds = [...existingIds, id];
+
     const { commitUrl } = await commitFiles(
       [
         { path: catalogFilePath(id), base64Content: toBase64(jsonFileContent(parsed.data)) },
@@ -120,16 +126,20 @@ export async function createCatalog(name: string): Promise<CreateCatalogResult> 
  * ningún catálogo.
  */
 export async function deleteCatalog(id: string): Promise<DeleteCatalogResult> {
-  if (!(id in catalogs)) {
-    return { ok: false, error: `No existe un catálogo con el id "${id}".` };
-  }
-
-  const remainingIds = Object.keys(catalogs).filter((existingId) => existingId !== id);
-  if (remainingIds.length === 0) {
-    return { ok: false, error: "No se puede eliminar el único catálogo que queda." };
-  }
-
   try {
+    // Mismo motivo que en createCatalog: la lista de ids sale de
+    // GitHub en vivo, no del registro que ya tiene cargado este
+    // proceso.
+    const existingIds = await listRepoJsonFileIds(CATALOGS_DIR);
+    if (!existingIds.includes(id)) {
+      return { ok: false, error: `No existe un catálogo con el id "${id}".` };
+    }
+
+    const remainingIds = existingIds.filter((existingId) => existingId !== id);
+    if (remainingIds.length === 0) {
+      return { ok: false, error: "No se puede eliminar el único catálogo que queda." };
+    }
+
     const { commitUrl } = await commitFiles(
       [
         { path: catalogFilePath(id), base64Content: null },

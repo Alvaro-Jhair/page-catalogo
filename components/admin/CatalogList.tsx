@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { deleteCatalogAction } from "@/app/admin/actions";
 
 export type CatalogListItem = {
@@ -17,15 +16,20 @@ type CatalogListProps = {
 
 /**
  * Cada tarjeta linkea a su editor (/admin/[id]) y tiene un botón de
- * borrar aparte — es su propio componente cliente (no un <Link> puro
- * como antes) porque borrar necesita confirmar, llamar a la Server
- * Action y refrescar la lista sin navegar.
+ * borrar aparte. El commit de borrado se confirma al toque, pero el
+ * catálogo sigue compilado en el registro que corre este servidor
+ * hasta el próximo redeploy — así que en vez de un router.refresh()
+ * (que no cambiaría nada visible todavía y daría la falsa impresión de
+ * que no pasó nada), la tarjeta se oculta localmente apenas el commit
+ * confirma, con una nota de que la desaparición real tarda ~1 minuto.
  */
 export default function CatalogList({ catalogs }: CatalogListProps) {
-  const router = useRouter();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const [, startTransition] = useTransition();
+
+  const visible = catalogs.filter((c) => !deletedIds.includes(c.id));
 
   const handleDelete = (id: string) => {
     if (!confirm(`¿Eliminar el catálogo "${id}"? No se puede deshacer.`)) return;
@@ -35,7 +39,7 @@ export default function CatalogList({ catalogs }: CatalogListProps) {
       const res = await deleteCatalogAction(id);
       setPendingId(null);
       if (res.ok) {
-        router.refresh();
+        setDeletedIds((prev) => [...prev, id]);
       } else {
         setError(res.error);
       }
@@ -45,7 +49,7 @@ export default function CatalogList({ catalogs }: CatalogListProps) {
   return (
     <div className="admin-catalog-list-wrap">
       <div className="admin-catalog-list">
-        {catalogs.map((c) => (
+        {visible.map((c) => (
           <div className="admin-catalog-card" key={c.id}>
             <Link href={`/admin/${c.id}`} className="admin-catalog-card-link">
               <span className="admin-catalog-card-title">{c.title}</span>
@@ -57,9 +61,9 @@ export default function CatalogList({ catalogs }: CatalogListProps) {
               type="button"
               className="admin-btn admin-btn-icon admin-btn-danger"
               onClick={() => handleDelete(c.id)}
-              disabled={pendingId === c.id || catalogs.length <= 1}
+              disabled={pendingId === c.id || visible.length <= 1}
               aria-label={`Eliminar ${c.id}`}
-              title={catalogs.length <= 1 ? "No se puede eliminar el único catálogo" : "Eliminar catálogo"}
+              title={visible.length <= 1 ? "No se puede eliminar el único catálogo" : "Eliminar catálogo"}
             >
               {pendingId === c.id ? "…" : "✕"}
             </button>
@@ -67,6 +71,14 @@ export default function CatalogList({ catalogs }: CatalogListProps) {
         ))}
       </div>
       {error && <p className="admin-save-message error">{error}</p>}
+      {deletedIds.length > 0 && (
+        <p className="admin-image-picker-note">
+          {deletedIds.length === 1
+            ? `Catálogo "${deletedIds[0]}" eliminado del repo.`
+            : `${deletedIds.length} catálogos eliminados del repo.`}{" "}
+          Van a desaparecer del sitio público en cuanto Vercel termine de redesplegar.
+        </p>
+      )}
     </div>
   );
 }
