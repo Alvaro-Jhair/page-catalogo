@@ -294,3 +294,11 @@ Added a "Vista previa" button to `AdminEditor` rather than building a separate p
 Added a solid-color option to the colorway template (`lib/templates.ts`'s `ColorwayTemplateInput.swatch`): some colorways don't have a photo crop clean enough to use as a swatch chip. `SwatchItem` was already a `{ type: "image" }` / `{ type: "color" }` discriminated union in `data/schema.ts` since Phase 3 — this only needed a second branch in the template constructor and a Foto/Color toggle in `AddColorwayForm`, no schema change.
 
 Verified: `npm run build` (including the PDF step, now against `/catalog/ariel`) and `tsc --noEmit` both clean. End-to-end with Playwright against a real running build: `/` shows the index card and links into `/catalog/ariel`; the catalog itself renders unchanged; admin login, the preview overlay (opens over the live unsaved state, closes cleanly), and the color-swatch toggle (color input appears, selected color renders correctly as the swatch chip on the actual detail page) all confirmed working end-to-end, including one added test colorway inspected directly in the preview to confirm the solid-color chip renders rather than a broken image reference. Test login used temporary throwaway credentials patched into `.env.local` for the run and restored immediately after — the real admin credentials were never touched or exposed.
+
+2026-07-27 (fix — broken PDF download on Vercel)
+
+Diagnosed from a real Vercel build log (`vercel inspect --logs`), not guessed: Playwright's own downloaded Chromium can't launch in Vercel's build container — `error while loading shared libraries: libnspr4.so`. No `apt-get`/sudo access there, so installing the missing system library by hand isn't an option.
+
+Fixed with `@sparticuz/chromium` (a Chromium build statically linked for Lambda/Vercel-style containers), used only when `process.env.VERCEL` is set — locally (or any other CI) `scripts/generate-pdf.mjs` keeps using Playwright's own Chromium unchanged, since `@sparticuz/chromium`'s binary is Linux-specific and won't run on macOS.
+
+Verified against a real deploy: the Vercel build log shows `[generate-pdf] wrote public/catalog-ariel.pdf` with no errors, and `curl -I https://page-catalogo.vercel.app/catalog-ariel.pdf` now returns `200` with the real file size (~8.5MB), not the previous `404`.
