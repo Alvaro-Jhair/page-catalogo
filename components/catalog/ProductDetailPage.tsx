@@ -1,7 +1,7 @@
 import PageNumber from "./PageNumber";
 import Collage from "./Collage";
 import SwatchGroup from "./SwatchGroup";
-import type { ProductVariant } from "@/data/catalog";
+import type { ProductVariant } from "@/data/schema";
 
 type ProductDetailPageProps = {
   variant: ProductVariant;

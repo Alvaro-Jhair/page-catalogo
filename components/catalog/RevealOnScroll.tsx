@@ -5,13 +5,15 @@ import { useEffect, useRef, type ReactNode } from "react";
 type RevealOnScrollProps = {
   children: ReactNode;
   className?: string;
+  /** Retraso en ms antes de iniciar la transición, para escalonar varios bloques. */
+  delay?: number;
 };
 
 /**
  * Envuelve contenido que debe aparecer con fade-in al entrar en viewport.
  * Reemplaza el IntersectionObserver global que antes vivía en un <script> suelto.
  */
-export default function RevealOnScroll({ children, className = "" }: RevealOnScrollProps) {
+export default function RevealOnScroll({ children, className = "", delay }: RevealOnScrollProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export default function RevealOnScroll({ children, className = "" }: RevealOnScr
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             el.classList.add("visible");
+            observer.unobserve(el);
           }
         });
       },
@@ -34,7 +37,11 @@ export default function RevealOnScroll({ children, className = "" }: RevealOnScr
   }, []);
 
   return (
-    <div ref={ref} className={`reveal ${className}`.trim()}>
+    <div
+      ref={ref}
+      className={`reveal ${className}`.trim()}
+      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+    >
       {children}
     </div>
   );

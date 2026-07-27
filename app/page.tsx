@@ -1,45 +1,12 @@
-import CoverPage from "@/components/catalog/CoverPage";
-import ManifestoPage from "@/components/catalog/ManifestoPage";
-import ProductHero from "@/components/catalog/ProductHero";
-import ChapterHero from "@/components/catalog/ChapterHero";
-import ProductDetailPage from "@/components/catalog/ProductDetailPage";
-import ClosingPage from "@/components/catalog/ClosingPage";
-import {
-  cover,
-  manifesto,
-  productHero,
-  productVariants,
-  chapterHeroes,
-  closing,
-} from "@/data/catalog";
+import CatalogRenderer from "@/components/catalog/CatalogRenderer";
+import { catalogs } from "@/data/catalogs";
 
 /**
- * Página del catálogo Ariel. El orden de las secciones es:
- * portada -> manifiesto -> hero de producto -> [detalle + capítulo] x colorway -> cierre.
- * Todo el contenido (textos, precios, imágenes) viene de data/catalog.ts.
+ * Punto de entrada de la web: pide el catálogo "ariel" al registro
+ * (data/catalogs/index.ts) y lo renderiza con CatalogRenderer. No sabe
+ * nada de secciones, bloques ni contenido — esa lógica vive en
+ * data/catalogs/, data/schema.ts y components/catalog/.
  */
 export default function CatalogPage() {
-  const [ivory, emerald, noir, gold] = productVariants;
-  const [greenChapter, blackChapter, goldChapter] = chapterHeroes;
-
-  return (
-    <main>
-      <CoverPage data={cover} />
-      <ManifestoPage data={manifesto} />
-      <ProductHero data={productHero} />
-
-      <ProductDetailPage variant={ivory} />
-
-      <ChapterHero data={greenChapter} />
-      <ProductDetailPage variant={emerald} />
-
-      <ChapterHero data={blackChapter} />
-      <ProductDetailPage variant={noir} />
-
-      <ChapterHero data={goldChapter} />
-      <ProductDetailPage variant={gold} />
-
-      <ClosingPage data={closing} />
-    </main>
-  );
+  return <CatalogRenderer blocks={catalogs.ariel} pdfHref="/catalog-ariel.pdf" />;
 }

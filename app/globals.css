@@ -27,13 +27,44 @@ a {
   text-decoration: none;
 }
 
+/* ───── SCROLL PROGRESS ───── */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+  background: var(--accent);
+  transition: transform 0.1s linear;
+}
+
 /* ───── PAGE BASE ───── */
 .page {
   position: relative;
   min-height: 100svh;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
   overflow: hidden;
+  isolation: isolate;
   background: #111;
+}
+
+.page-bg {
+  z-index: -1;
+}
+
+.page-overlay {
+  position: absolute;
+  inset: 0;
 }
 
 .page-no {
@@ -63,6 +94,18 @@ a {
 .reveal.visible {
   opacity: 1;
   transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* ───── COVER ───── */
@@ -218,9 +261,16 @@ a {
   transition: transform 0.7s ease, filter 0.7s ease;
 }
 
-.collage figure:hover img {
+.collage figure:active img {
   transform: scale(1.03);
   filter: contrast(1.04);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .collage figure:hover img {
+    transform: scale(1.03);
+    filter: contrast(1.04);
+  }
 }
 
 .info {
@@ -272,7 +322,7 @@ a {
   transition: border-color 0.25s ease, transform 0.25s ease;
 }
 
-.swatch:hover {
+.swatch:active {
   border-color: #111;
   transform: translateY(-3px);
 }
@@ -285,9 +335,14 @@ a {
   transition: transform 0.4s ease;
 }
 
-.swatch:hover img {
+.swatch:active img {
   transform: scale(2.9);
   transform-origin: center 60%;
+}
+
+.swatch-color {
+  position: absolute;
+  inset: 0;
 }
 
 .swatch-label {
@@ -306,8 +361,24 @@ a {
   transition: opacity 0.25s ease;
 }
 
-.swatch:hover .swatch-label {
+.swatch:active .swatch-label {
   opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .swatch:hover {
+    border-color: #111;
+    transform: translateY(-3px);
+  }
+
+  .swatch:hover img {
+    transform: scale(2.9);
+    transform-origin: center 60%;
+  }
+
+  .swatch:hover .swatch-label {
+    opacity: 1;
+  }
 }
 
 .rule {
@@ -346,12 +417,6 @@ a {
   color: #fff;
 }
 
-.chapter .shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.03) 60%);
-}
-
 .chapter .product-name {
   z-index: 3;
 }
@@ -379,6 +444,16 @@ a {
   text-transform: uppercase;
   line-height: 1.8;
   margin: 0;
+}
+
+.pdf-download-link {
+  display: inline-block;
+  margin-top: 28px;
+  padding-bottom: 2px;
+  font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 /* ───── RESPONSIVE ───── */
@@ -409,6 +484,12 @@ a {
     grid-template-columns: 1fr 1fr;
   }
 
+  .collage.three figure:last-child {
+    grid-column: 1 / -1;
+    width: 50%;
+    justify-self: center;
+  }
+
   .collage.two {
     grid-template-columns: 1fr 1fr;
   }
@@ -434,4 +515,34 @@ a {
   .product-name h2 {
     font-size: clamp(2rem, 9vw, 3.8rem);
   }
+}
+
+/* ───── PRINT (PDF export, Fase 7) ───── */
+/* Cada .page se imprime como una página física propia; el navegador
+   headless que genera el PDF (scripts/generate-pdf.mjs) usa un
+   viewport fijo cuyo tamaño coincide con el @page de abajo, así que
+   100svh sigue resolviendo al alto real de cada página impresa. */
+@media print {
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .scroll-progress,
+  .pdf-download-link {
+    display: none;
+  }
+
+  .page {
+    break-after: page;
+    break-inside: avoid;
+  }
+
+  .page:last-of-type {
+    break-after: auto;
+  }
+}
+
+@page {
+  margin: 0;
 }

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CollageImage, CollageLayout } from "@/data/catalog";
+import type { CollageImage, CollageLayout } from "@/data/schema";
 
 type CollageProps = {
   images: CollageImage[];
