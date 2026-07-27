@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { Block } from "@/data/schema";
 import BlockList, { type EditableBlock } from "./BlockList";
 import AddColorwayForm from "./AddColorwayForm";
+import PreviewOverlay from "./PreviewOverlay";
 import { saveCatalogAction } from "@/app/admin/actions";
 
 const BLOCK_TYPES: Block["type"][] = [
@@ -84,6 +85,7 @@ export default function AdminEditor({ initialBlocks }: AdminEditorProps) {
   const [newType, setNewType] = useState<Block["type"]>("productDetail");
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<SaveResult | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const addBlock = () => {
     setItems([...items, { key: makeKey(), block: defaultBlockFor(newType) }]);
@@ -131,6 +133,10 @@ export default function AdminEditor({ initialBlocks }: AdminEditorProps) {
       </div>
 
       <div className="admin-save-bar">
+        <button type="button" className="admin-btn" onClick={() => setPreviewOpen(true)}>
+          Vista previa
+        </button>
+
         <button
           type="button"
           className="admin-btn admin-btn-primary"
@@ -161,6 +167,13 @@ export default function AdminEditor({ initialBlocks }: AdminEditorProps) {
             </div>
           ))}
       </div>
+
+      {previewOpen && (
+        <PreviewOverlay
+          blocks={items.map((item) => item.block)}
+          onClose={() => setPreviewOpen(false)}
+        />
+      )}
     </>
   );
 }

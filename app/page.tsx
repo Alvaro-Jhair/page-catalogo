@@ -1,12 +1,48 @@
-import CatalogRenderer from "@/components/catalog/CatalogRenderer";
+import Image from "next/image";
+import Link from "next/link";
 import { catalogs } from "@/data/catalogs";
+import type { Block, CatalogBlocks } from "@/data/schema";
+
+function getCoverBlock(blocks: CatalogBlocks) {
+  return blocks.find((b): b is Extract<Block, { type: "cover" }> => b.type === "cover");
+}
 
 /**
- * Punto de entrada de la web: pide el catálogo "ariel" al registro
- * (data/catalogs/index.ts) y lo renderiza con CatalogRenderer. No sabe
- * nada de secciones, bloques ni contenido — esa lógica vive en
- * data/catalogs/, data/schema.ts y components/catalog/.
+ * Índice de catálogos disponibles: una tarjeta por catálogo del
+ * registro (data/catalogs/index.ts), usando su propio bloque "cover"
+ * para el título/imagen — no hay un segundo lugar donde mantener esos
+ * datos al día. Cada tarjeta linkea a /catalog/[id], que sí es la URL
+ * pensada para compartir un catálogo puntual.
  */
-export default function CatalogPage() {
-  return <CatalogRenderer blocks={catalogs.ariel} pdfHref="/catalog-ariel.pdf" />;
+export default function HomePage() {
+  const entries = Object.entries(catalogs);
+
+  return (
+    <main className="catalog-index">
+      <div className="catalog-index-header">
+        <p>Catálogos</p>
+      </div>
+      <div className="catalog-index-grid">
+        {entries.map(([id, blocks]) => {
+          const cover = getCoverBlock(blocks);
+          if (!cover) return null;
+          return (
+            <Link key={id} href={`/catalog/${id}`} className="catalog-index-card">
+              <Image
+                src={cover.data.bgImage}
+                alt=""
+                fill
+                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                style={{ objectFit: "cover" }}
+              />
+              <div className="catalog-index-card-overlay">
+                <h2>{cover.data.title}</h2>
+                <span>{cover.data.subtitle}</span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </main>
+  );
 }

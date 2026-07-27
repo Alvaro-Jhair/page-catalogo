@@ -517,6 +517,84 @@ a {
   }
 }
 
+/* ───── CATALOG INDEX ("/", desde el índice multi-catálogo) ───── */
+.catalog-index {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 72px 24px 96px;
+}
+
+.catalog-index-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.catalog-index-header p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.catalog-index-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.catalog-index-card {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #ddd;
+}
+
+.catalog-index-card img {
+  transition: transform 0.6s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .catalog-index-card:hover img {
+    transform: scale(1.04);
+  }
+}
+
+.catalog-index-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 24px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+.catalog-index-card-overlay h2 {
+  margin: 0;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.catalog-index-card-overlay span {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 /* ───── PRINT (PDF export, Fase 7) ───── */
 /* Cada .page se imprime como una página física propia; el navegador
    headless que genera el PDF (scripts/generate-pdf.mjs) usa un

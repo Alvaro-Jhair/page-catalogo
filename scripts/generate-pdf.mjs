@@ -14,9 +14,17 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 
+// Por ahora solo existe el catálogo "ariel" (ver data/catalogs/index.ts).
+// El día que haya un segundo catálogo real, esto pasa a iterar sobre el
+// registro en vez de tener un id hardcodeado acá.
+const CATALOG_ID = "ariel";
+
 const PORT = process.env.PDF_GEN_PORT || "4173";
 const BASE_URL = `http://localhost:${PORT}`;
-const OUTPUT_PATH = path.join(rootDir, "public", "catalog-ariel.pdf");
+// "/" es el índice de catálogos, no un catálogo en sí — hay que imprimir
+// la página del catálogo puntual.
+const CATALOG_URL = `${BASE_URL}/catalog/${CATALOG_ID}`;
+const OUTPUT_PATH = path.join(rootDir, "public", `catalog-${CATALOG_ID}.pdf`);
 
 // Dimensiones fijas del "viewport" de impresión: proporción retrato
 // 3:4, coherente con el diseño mobile-first del lookbook. Cada .page
@@ -55,7 +63,7 @@ async function main() {
     const viewportWidth = parseInt(PAGE_WIDTH, 10);
     const viewportHeight = parseInt(PAGE_HEIGHT, 10);
     const page = await browser.newPage({ viewport: { width: viewportWidth, height: viewportHeight } });
-    await page.goto(BASE_URL, { waitUntil: "networkidle" });
+    await page.goto(CATALOG_URL, { waitUntil: "networkidle" });
 
     // El catálogo usa IntersectionObserver (RevealOnScroll) y lazy
     // loading nativo de next/image: ambos solo se disparan cuando el

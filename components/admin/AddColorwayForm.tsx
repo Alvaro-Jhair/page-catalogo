@@ -25,12 +25,22 @@ export default function AddColorwayForm({
   const [productName, setProductName] = useState(defaultProductName);
   const [productType, setProductType] = useState(defaultProductType);
   const [bgImage, setBgImage] = useState("/imagenes/1.png");
+  const [swatchType, setSwatchType] = useState<"image" | "color">("image");
+  const [swatchColor, setSwatchColor] = useState("#cccccc");
 
   const canAdd = colorwayName.trim().length > 0;
 
   const handleAdd = () => {
     if (!canAdd) return;
-    onAdd(createColorwayBlocks({ colorwayName, productName, productType, bgImage }));
+    onAdd(
+      createColorwayBlocks({
+        colorwayName,
+        productName,
+        productType,
+        bgImage,
+        swatch: swatchType === "color" ? { type: "color", color: swatchColor } : { type: "image" },
+      })
+    );
     setColorwayName("");
   };
 
@@ -62,6 +72,13 @@ export default function AddColorwayForm({
           value={bgImage}
           onChange={(e) => setBgImage(e.target.value)}
         />
+        <select value={swatchType} onChange={(e) => setSwatchType(e.target.value as "image" | "color")}>
+          <option value="image">Swatch: foto</option>
+          <option value="color">Swatch: color</option>
+        </select>
+        {swatchType === "color" && (
+          <input type="color" value={swatchColor} onChange={(e) => setSwatchColor(e.target.value)} />
+        )}
         <button
           type="button"
           className="admin-btn admin-btn-primary"

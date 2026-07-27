@@ -1,4 +1,4 @@
-import type { Block, ChapterHero, ProductVariant } from "@/data/schema";
+import type { Block, ChapterHero, ProductVariant, SwatchItem } from "@/data/schema";
 
 /**
  * "Template" en el sentido del roadmap (Fase 6): una composición de
@@ -13,7 +13,10 @@ export type ColorwayTemplateInput = {
   colorwayName: string;
   productName: string;
   productType: string;
+  /** Fondo del capítulo + primera imagen del collage — siempre una foto, como el resto del sitio. */
   bgImage: string;
+  /** El chip del swatch puede ser esa misma foto o un color plano; a diferencia del fondo, no compromete el diseño de las páginas a pantalla completa. */
+  swatch: { type: "image" } | { type: "color"; color: string };
 };
 
 function slugify(value: string): string {
@@ -38,6 +41,11 @@ export function createColorwayBlocks(input: ColorwayTemplateInput): [Block, Bloc
     bgImage: input.bgImage,
   };
 
+  const swatchItem: SwatchItem =
+    input.swatch.type === "color"
+      ? { label: input.colorwayName, type: "color", color: input.swatch.color }
+      : { label: input.colorwayName, type: "image", image: input.bgImage };
+
   const productDetail: ProductVariant = {
     id,
     pageNumber: 0,
@@ -49,7 +57,7 @@ export function createColorwayBlocks(input: ColorwayTemplateInput): [Block, Bloc
     collageImages: input.bgImage
       ? [{ src: input.bgImage, alt: `${input.productName} ${input.colorwayName}` }]
       : [],
-    swatches: input.bgImage ? [{ label: input.colorwayName, type: "image", image: input.bgImage }] : [],
+    swatches: [swatchItem],
   };
 
   return [
