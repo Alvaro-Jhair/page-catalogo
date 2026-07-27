@@ -35,7 +35,12 @@ export default async function AdminCatalogPage({ params }: AdminCatalogPageProps
         </div>
       </header>
       <main className="admin-main">
-        <AdminEditor catalogId={id} initialBlocks={entry.blocks} initialTheme={entry.theme} />
+        <AdminEditor
+          catalogId={id}
+          initialBlocks={entry.blocks}
+          initialTheme={entry.theme}
+          layoutId={entry.layoutId}
+        />
       </main>
     </AssetsProvider>
   );

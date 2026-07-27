@@ -10,7 +10,7 @@ import {
   type DeleteCatalogResult,
 } from "@/lib/catalogStore";
 import { uploadAsset, type UploadAssetResult } from "@/lib/assets";
-import type { Block, CatalogTheme } from "@/data/schema";
+import type { Block, CatalogTheme, LayoutId } from "@/data/schema";
 
 /**
  * Segunda verificación de sesión acá adentro (además del proxy) —
@@ -20,7 +20,8 @@ import type { Block, CatalogTheme } from "@/data/schema";
 export async function saveCatalogAction(
   catalogId: string,
   theme: CatalogTheme,
-  blocks: Block[]
+  blocks: Block[],
+  layoutId: LayoutId
 ): Promise<SaveCatalogResult> {
   await requireSession();
 
@@ -32,7 +33,9 @@ export async function saveCatalogAction(
     data: { ...block.data, pageNumber: i + 1 },
   })) as Block[];
 
-  return saveCatalog(catalogId, { theme, blocks: withPageNumbers });
+  // layoutId no se edita desde el admin (se fija al crear el catálogo,
+  // ver lib/newCatalog.ts) — acá solo se re-persiste tal cual llegó.
+  return saveCatalog(catalogId, { layoutId, theme, blocks: withPageNumbers });
 }
 
 export async function createCatalogAction(name: string, templateId?: string): Promise<CreateCatalogResult> {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { Block, CatalogTheme } from "@/data/schema";
+import type { Block, CatalogTheme, LayoutId } from "@/data/schema";
 import BlockList, { type EditableBlock } from "./BlockList";
 import AddColorwayForm from "./AddColorwayForm";
 import PreviewOverlay from "./PreviewOverlay";
@@ -77,11 +77,13 @@ type AdminEditorProps = {
   catalogId: string;
   initialBlocks: Block[];
   initialTheme: CatalogTheme;
+  /** Fijo al crear el catálogo (ver lib/newCatalog.ts) — no hay campo para editarlo acá a propósito: cambiarlo después podría dejar contenido que no calza con los supuestos visuales del layout nuevo. */
+  layoutId: LayoutId;
 };
 
 type SaveResult = Awaited<ReturnType<typeof saveCatalogAction>>;
 
-export default function AdminEditor({ catalogId, initialBlocks, initialTheme }: AdminEditorProps) {
+export default function AdminEditor({ catalogId, initialBlocks, initialTheme, layoutId }: AdminEditorProps) {
   const [items, setItems] = useState<EditableBlock[]>(() =>
     initialBlocks.map((block) => ({ key: makeKey(), block }))
   );
@@ -111,7 +113,8 @@ export default function AdminEditor({ catalogId, initialBlocks, initialTheme }: 
       const res = await saveCatalogAction(
         catalogId,
         theme,
-        items.map((item) => item.block)
+        items.map((item) => item.block),
+        layoutId
       );
       setResult(res);
     });
@@ -182,6 +185,7 @@ export default function AdminEditor({ catalogId, initialBlocks, initialTheme }: 
         <PreviewOverlay
           blocks={items.map((item) => item.block)}
           theme={theme}
+          layoutId={layoutId}
           onClose={() => setPreviewOpen(false)}
         />
       )}

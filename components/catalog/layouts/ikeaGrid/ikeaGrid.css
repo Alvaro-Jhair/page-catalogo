@@ -1,0 +1,299 @@
+/* ───── IKEA Grid (catálogo práctico) ─────
+   Identidad: grilla de bloques de color, tags amarillos, filetes
+   azules, specs numeradas. Todo bajo .layout-ikea-grid. */
+
+.layout-ikea-grid {
+  color: var(--ink);
+}
+
+.layout-ikea-grid .reveal {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---- Portada: grilla de bloques ---- */
+.layout-ikea-grid.ik-cover {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.layout-ikea-grid .ik-cover-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 3px;
+}
+
+.layout-ikea-grid .ik-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.layout-ikea-grid .ik-cell-photo {
+  grid-row: 1 / 4;
+}
+
+.layout-ikea-grid .ik-cell-yellow {
+  background: var(--accent);
+  color: #111;
+}
+
+.layout-ikea-grid .ik-issue {
+  font-family: var(--body-font);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.layout-ikea-grid .ik-cell-yellow h1 {
+  font-family: var(--display-font);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+  line-height: 1.02;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.layout-ikea-grid .ik-cell-blue {
+  background: var(--line);
+  color: #fff;
+  font-family: var(--body-font);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.layout-ikea-grid .ik-cell-dark {
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--body-font);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  gap: 4px;
+}
+
+.layout-ikea-grid .ik-cover-bottom {
+  flex: 0 0 auto;
+  padding: 12px 24px 40px;
+  font-family: var(--body-font);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+/* ---- Página de producto: tarjeta modular ---- */
+.layout-ikea-grid.ik-detail {
+  display: flex;
+  background: #fff;
+}
+
+.layout-ikea-grid .ik-detail-photos {
+  position: relative;
+  flex: 1 1 58%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  background: var(--ink);
+}
+
+.layout-ikea-grid .ik-photo-cell {
+  position: relative;
+}
+
+.layout-ikea-grid .ik-price-tag {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  background: var(--accent);
+  color: #111;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.layout-ikea-grid .ik-price-tag span {
+  font-family: var(--body-font);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.layout-ikea-grid .ik-price-tag b {
+  font-family: var(--body-font);
+  font-size: 1.2rem;
+}
+
+.layout-ikea-grid .ik-detail-info {
+  flex: 1 1 42%;
+  min-width: 260px;
+  padding: 44px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.layout-ikea-grid .ik-article-no {
+  font-family: var(--body-font);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--line);
+}
+
+.layout-ikea-grid .ik-detail-info h3 {
+  font-family: var(--display-font);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.layout-ikea-grid .ik-detail-type {
+  font-family: var(--body-font);
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.layout-ikea-grid .ik-rule {
+  height: 2px;
+  background: var(--line);
+}
+
+.layout-ikea-grid .ik-specs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.layout-ikea-grid .ik-specs li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--body-font);
+  font-size: 0.88rem;
+}
+
+.layout-ikea-grid .ik-specs li span {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--line);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.layout-ikea-grid .ik-swatches-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.layout-ikea-grid .ik-label {
+  font-family: var(--body-font);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+/* ---- Statement (manifiesto / hero / capítulo / cierre) ---- */
+.layout-ikea-grid.ik-statement {
+  display: flex;
+  align-items: flex-end;
+  padding: 32px 34px 64px;
+  color: #fff;
+}
+
+.layout-ikea-grid .ik-statement-tag {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  background: var(--accent);
+  color: #111;
+  padding: 6px 12px;
+  font-family: var(--body-font);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.layout-ikea-grid .ik-statement-inner {
+  max-width: 560px;
+}
+
+.layout-ikea-grid .ik-statement-rule {
+  width: 44px;
+  height: 3px;
+  background: var(--line);
+  margin-bottom: 14px;
+}
+
+.layout-ikea-grid .ik-statement-inner h2 {
+  font-family: var(--display-font);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 4.4vw, 3rem);
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  line-height: 1.02;
+}
+
+.layout-ikea-grid .ik-statement-body {
+  font-family: var(--body-font);
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.layout-ikea-grid .ik-statement-link {
+  display: inline-block;
+  margin-top: 16px;
+  background: var(--accent);
+  color: #111;
+  padding: 8px 14px;
+  font-family: var(--body-font);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 850px) {
+  .layout-ikea-grid.ik-detail {
+    flex-direction: column;
+  }
+
+  .layout-ikea-grid .ik-detail-photos {
+    flex: 0 0 46vh;
+  }
+
+  .layout-ikea-grid .ik-detail-info {
+    min-width: 0;
+    padding: 26px 22px;
+  }
+
+  .layout-ikea-grid .ik-cover-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1.2fr 0.6fr 0.6fr 0.6fr;
+  }
+
+  .layout-ikea-grid .ik-cell-photo {
+    grid-row: 1;
+  }
+}

@@ -1,0 +1,232 @@
+/* ───── Zara Editorial ─────
+   Identidad: asimetría, serif grande, tracking amplio, casi sin
+   decoración — el margen vacío ES el elemento de diseño. Todo bajo
+   .layout-zara-editorial. */
+
+.layout-zara-editorial {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.layout-zara-editorial .reveal {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---- Portada: asimétrica ---- */
+.layout-zara-editorial.za-cover {
+  display: flex;
+}
+
+.layout-zara-editorial .za-cover-text {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 44px;
+}
+
+.layout-zara-editorial .za-cover-meta {
+  font-family: var(--body-font);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+
+.layout-zara-editorial .za-cover-text h1 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5.6vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin: 0 0 20px;
+}
+
+.layout-zara-editorial .za-cover-text p {
+  font-family: var(--body-font);
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.layout-zara-editorial .za-cover-image {
+  position: relative;
+  flex: 1 1 60%;
+}
+
+.layout-zara-editorial .za-cover-bottom {
+  position: absolute;
+  left: 44px;
+  bottom: 40px;
+  font-family: var(--body-font);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- Página de producto: imagen 65% / contenido angosto ---- */
+.layout-zara-editorial.za-detail {
+  display: flex;
+}
+
+.layout-zara-editorial .za-detail-image {
+  position: relative;
+  flex: 1 1 65%;
+}
+
+.layout-zara-editorial .za-detail-content {
+  flex: 1 1 35%;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 40px;
+}
+
+.layout-zara-editorial .za-detail-content h3 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.layout-zara-editorial .za-detail-type {
+  font-family: var(--body-font);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: -8px 0 0;
+}
+
+.layout-zara-editorial .za-detail-desc p {
+  font-family: var(--body-font);
+  font-size: 0.88rem;
+  letter-spacing: 0.03em;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0;
+}
+
+.layout-zara-editorial .za-detail-secondary {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.layout-zara-editorial .za-detail-price {
+  font-family: var(--body-font);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.layout-zara-editorial .za-detail-price span {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- Statement (manifiesto / hero / capítulo / cierre) ---- */
+.layout-zara-editorial.za-statement {
+  display: flex;
+  align-items: center;
+  padding: 0 60px;
+  color: #fff;
+}
+
+.layout-zara-editorial .za-statement-inner {
+  max-width: 480px;
+}
+
+.layout-zara-editorial .za-statement-eyebrow {
+  display: block;
+  font-family: var(--body-font);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.layout-zara-editorial .za-statement-rule {
+  width: 36px;
+  height: 1px;
+  background: #fff;
+  margin-bottom: 20px;
+}
+
+.layout-zara-editorial .za-statement-inner h2 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(2rem, 4.6vw, 3.2rem);
+  text-transform: uppercase;
+  line-height: 1.04;
+  margin: 0 0 14px;
+}
+
+.layout-zara-editorial .za-statement-body {
+  font-family: var(--body-font);
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.layout-zara-editorial .za-statement-link {
+  display: inline-block;
+  margin-top: 18px;
+  font-family: var(--body-font);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #fff;
+  padding-bottom: 3px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 850px) {
+  .layout-zara-editorial.za-cover {
+    flex-direction: column;
+  }
+
+  .layout-zara-editorial .za-cover-text {
+    flex: 0 0 auto;
+    padding: 40px 28px 24px;
+  }
+
+  .layout-zara-editorial .za-cover-image {
+    flex: 1 1 auto;
+  }
+
+  .layout-zara-editorial .za-cover-bottom {
+    left: 28px;
+  }
+
+  .layout-zara-editorial.za-detail {
+    flex-direction: column;
+  }
+
+  .layout-zara-editorial .za-detail-image {
+    flex: 0 0 48vh;
+  }
+
+  .layout-zara-editorial .za-detail-content {
+    min-width: 0;
+    padding: 26px 28px;
+  }
+
+  .layout-zara-editorial .za-detail-secondary {
+    display: none;
+  }
+}

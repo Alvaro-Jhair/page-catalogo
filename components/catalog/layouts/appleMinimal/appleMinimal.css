@@ -1,0 +1,157 @@
+/* ───── Apple Minimal ─────
+   Identidad: fondo blanco, muchísimo espacio, sin filetes ni marcos,
+   una sola foto grande, tipografía sans precisa. La ausencia de
+   decoración ES el lenguaje decorativo. Todo bajo .layout-apple-minimal. */
+
+.layout-apple-minimal {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.layout-apple-minimal .reveal {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---- Portada ---- */
+.layout-apple-minimal.am-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  text-align: center;
+  padding: 60px 32px;
+}
+
+.layout-apple-minimal .am-cover-meta {
+  position: absolute;
+  top: 30px;
+  font-family: var(--body-font);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.layout-apple-minimal .am-cover-image {
+  position: relative;
+  width: min(46vw, 460px);
+  aspect-ratio: 3 / 4;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.layout-apple-minimal .am-cover-text h1 {
+  font-family: var(--display-font);
+  font-weight: 600;
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+}
+
+.layout-apple-minimal .am-cover-text p {
+  font-family: var(--body-font);
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ---- Página de producto: una foto enorme + texto centrado ---- */
+.layout-apple-minimal.am-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-apple-minimal .am-detail-image {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.layout-apple-minimal .am-detail-text {
+  flex: 0 0 auto;
+  text-align: center;
+  padding: 34px 32px 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.layout-apple-minimal .am-detail-text h3 {
+  font-family: var(--display-font);
+  font-weight: 600;
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.layout-apple-minimal .am-detail-type,
+.layout-apple-minimal .am-detail-desc {
+  font-family: var(--body-font);
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.layout-apple-minimal .am-detail-price {
+  font-family: var(--body-font);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+.layout-apple-minimal .am-detail-text .swatches {
+  justify-content: center;
+  margin-top: 6px;
+}
+
+/* ---- Statement (manifiesto / hero / capítulo / cierre) ---- */
+.layout-apple-minimal.am-statement {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: center;
+  padding-bottom: 10%;
+}
+
+.layout-apple-minimal .am-statement-overlay {
+  background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.38) 100%);
+}
+
+.layout-apple-minimal .am-statement-inner {
+  max-width: 520px;
+  color: #fff;
+}
+
+.layout-apple-minimal .am-statement-inner h2 {
+  font-family: var(--display-font);
+  font-weight: 600;
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+
+.layout-apple-minimal .am-statement-body {
+  font-family: var(--body-font);
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  line-height: 1.6;
+  opacity: 0.92;
+  margin: 0;
+}
+
+.layout-apple-minimal .am-statement-link {
+  display: inline-block;
+  margin-top: 18px;
+  font-family: var(--body-font);
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 700px) {
+  .layout-apple-minimal .am-cover-image {
+    width: 78vw;
+  }
+}

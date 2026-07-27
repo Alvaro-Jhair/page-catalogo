@@ -17,7 +17,7 @@ export const SwatchItemSchema = z.discriminatedUnion("type", [
 ]);
 export type SwatchItem = z.infer<typeof SwatchItemSchema>;
 
-export const CollageLayoutSchema = z.enum(["four", "three", "two"]);
+export const CollageLayoutSchema = z.enum(["four", "three", "two", "one"]);
 export type CollageLayout = z.infer<typeof CollageLayoutSchema>;
 
 export const CollageImageSchema = z.object({
@@ -121,7 +121,30 @@ export const CatalogThemeSchema = z.object({
 });
 export type CatalogTheme = z.infer<typeof CatalogThemeSchema>;
 
+// ---- Layout: which set of section components renders this catalog ----
+//
+// "original" is Ariel's exact, untouched design (components/catalog/*.tsx)
+// — every other id maps to a fully distinct Cover/ProductDetail/Statement
+// component set under components/catalog/layouts/<id>/. Fixed at catalog
+// creation (via the template carousel), not editable afterward — swapping
+// a layout on existing content risks a mismatch between the layout's
+// visual assumptions (e.g. one photo vs four per colorway) and the data.
+export const LayoutIdSchema = z.enum([
+  "original",
+  "editorial-lux",
+  "apple-minimal",
+  "ikea-grid",
+  "nike-bold",
+  "zara-editorial",
+  "japanese-minimal",
+  "streetwear-dark",
+  "architecture-grid",
+  "modern-premium",
+]);
+export type LayoutId = z.infer<typeof LayoutIdSchema>;
+
 export const CatalogEntrySchema = z.object({
+  layoutId: LayoutIdSchema.default("original"),
   theme: CatalogThemeSchema,
   blocks: CatalogBlocksSchema,
 });

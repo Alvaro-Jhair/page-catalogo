@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import ScrollProgress from "./ScrollProgress";
 import BlockRenderer from "./BlockRenderer";
-import type { CatalogBlocks, CatalogTheme } from "@/data/schema";
+import type { CatalogBlocks, CatalogTheme, LayoutId } from "@/data/schema";
 
 type CatalogRendererProps = {
   blocks: CatalogBlocks;
@@ -10,6 +10,9 @@ type CatalogRendererProps = {
    * app/globals.css para este árbol — nunca a otros catálogos ni al
    * resto del sitio. */
   theme?: CatalogTheme;
+  /** Qué set de componentes usar para dibujar cada bloque — ver
+   * components/catalog/layouts. Por defecto "original" (Ariel). */
+  layoutId?: LayoutId;
   /** Link de descarga del PDF del catálogo (Fase 7), si existe. */
   pdfHref?: string;
 };
@@ -33,12 +36,17 @@ function themeStyle(theme?: CatalogTheme): CSSProperties | undefined {
  * No sabe ni le importa de qué catálogo se trata — quien llama decide
  * qué `blocks`/`theme` pasarle (ver data/catalogs/index.ts).
  */
-export default function CatalogRenderer({ blocks, theme, pdfHref }: CatalogRendererProps) {
+export default function CatalogRenderer({ blocks, theme, layoutId = "original", pdfHref }: CatalogRendererProps) {
   return (
     <main className="catalog-root" style={themeStyle(theme)}>
       <ScrollProgress />
       {blocks.map((block) => (
-        <BlockRenderer key={`${block.type}-${block.data.pageNumber}`} block={block} pdfHref={pdfHref} />
+        <BlockRenderer
+          key={`${block.type}-${block.data.pageNumber}`}
+          block={block}
+          layoutId={layoutId}
+          pdfHref={pdfHref}
+        />
       ))}
     </main>
   );

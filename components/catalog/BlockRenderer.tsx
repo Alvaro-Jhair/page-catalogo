@@ -1,37 +1,36 @@
-import CoverPage from "./CoverPage";
-import ManifestoPage from "./ManifestoPage";
-import ProductHero from "./ProductHero";
-import ChapterHero from "./ChapterHero";
-import ProductDetailPage from "./ProductDetailPage";
-import ClosingPage from "./ClosingPage";
-import type { Block } from "@/data/schema";
+import { LAYOUTS } from "./layouts";
+import type { Block, LayoutId } from "@/data/schema";
 
 type BlockRendererProps = {
   block: Block;
+  /** Qué identidad visual usar — ver components/catalog/layouts. */
+  layoutId: LayoutId;
   /** Solo lo usa el bloque "closing" — ver ClosingPage. */
   pdfHref?: string;
 };
 
 /**
  * Dispatcher genérico: traduce un bloque de datos al componente que le
- * corresponde. El switch exhaustivo (con el chequeo `never`) hace que
- * agregar un tipo de bloque nuevo sin manejarlo acá sea un error de
- * compilación, no un bug silencioso en producción.
+ * corresponde, dentro del set de componentes del layout activo. El switch
+ * exhaustivo (con el chequeo `never`) hace que agregar un tipo de bloque
+ * nuevo sin manejarlo acá sea un error de compilación, no un bug
+ * silencioso en producción.
  */
-export default function BlockRenderer({ block, pdfHref }: BlockRendererProps) {
+export default function BlockRenderer({ block, layoutId, pdfHref }: BlockRendererProps) {
+  const L = LAYOUTS[layoutId];
   switch (block.type) {
     case "cover":
-      return <CoverPage data={block.data} />;
+      return <L.CoverPage data={block.data} />;
     case "manifesto":
-      return <ManifestoPage data={block.data} />;
+      return <L.ManifestoPage data={block.data} />;
     case "productHero":
-      return <ProductHero data={block.data} />;
+      return <L.ProductHero data={block.data} />;
     case "chapterHero":
-      return <ChapterHero data={block.data} />;
+      return <L.ChapterHero data={block.data} />;
     case "productDetail":
-      return <ProductDetailPage variant={block.data} />;
+      return <L.ProductDetailPage variant={block.data} />;
     case "closing":
-      return <ClosingPage data={block.data} pdfHref={pdfHref} />;
+      return <L.ClosingPage data={block.data} pdfHref={pdfHref} />;
     default: {
       const exhaustiveCheck: never = block;
       return exhaustiveCheck;

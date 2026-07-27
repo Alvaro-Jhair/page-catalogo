@@ -1,0 +1,257 @@
+/* ───── Editorial Lux (Vogue / Harper's Bazaar) ─────
+   Identidad: masthead de revista, versalitas, filete rojo, columna de
+   caption editorial. Todo prefijado bajo .layout-editorial-lux para no
+   chocar con ningún otro layout. */
+
+.layout-editorial-lux {
+  color: #fff;
+}
+
+/* Le da posición relativa a cualquier .reveal para que el link de PDF
+   del cierre no quede debajo del .page-overlay (mismo bug ya conocido
+   del layout original, mismo fix preventivo acá). */
+.layout-editorial-lux .reveal {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---- Portada ---- */
+.layout-editorial-lux.ed-cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  padding: 34px 32px 56px;
+}
+
+.layout-editorial-lux .ed-cover-top {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--body-font);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.layout-editorial-lux .ed-masthead {
+  margin: auto 0;
+}
+
+.layout-editorial-lux .ed-masthead h1 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(3rem, 11vw, 7.2rem);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.layout-editorial-lux .ed-masthead-rule {
+  width: 56px;
+  height: 2px;
+  background: var(--accent);
+  margin: 20px auto 0;
+}
+
+.layout-editorial-lux .ed-coverline {
+  margin-top: 18px;
+  font-family: var(--body-font);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.layout-editorial-lux .ed-cover-subtitle {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  margin: 0 0 14px;
+}
+
+.layout-editorial-lux .ed-cover-lines {
+  font-family: var(--body-font);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin: 0;
+}
+
+/* ---- Página de producto: foto + columna de caption ---- */
+.layout-editorial-lux.ed-detail {
+  display: flex;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.layout-editorial-lux .ed-detail-image {
+  position: relative;
+  flex: 1 1 68%;
+  min-width: 0;
+}
+
+.layout-editorial-lux .ed-detail-caption {
+  flex: 1 1 32%;
+  min-width: 260px;
+  padding: 56px 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.layout-editorial-lux .ed-detail-kicker {
+  font-family: var(--body-font);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.layout-editorial-lux .ed-detail-caption h3 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.6vw, 2.3rem);
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.05;
+}
+
+.layout-editorial-lux .ed-detail-type {
+  font-family: var(--body-font);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.layout-editorial-lux .ed-detail-rule {
+  width: 100%;
+  height: 1px;
+  background: var(--line);
+}
+
+.layout-editorial-lux .ed-detail-desc p {
+  font-family: var(--body-font);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+
+.layout-editorial-lux .ed-detail-inset {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.layout-editorial-lux .ed-detail-price {
+  margin-top: auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--body-font);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.layout-editorial-lux .ed-detail-price span {
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.layout-editorial-lux .ed-detail-price b {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* ---- Statement (manifiesto / hero / capítulo / cierre) ---- */
+.layout-editorial-lux.ed-statement {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 60px 32px;
+}
+
+.layout-editorial-lux .ed-statement-inner {
+  max-width: 640px;
+}
+
+.layout-editorial-lux .ed-statement-kicker {
+  display: block;
+  font-family: var(--body-font);
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.layout-editorial-lux .ed-statement-rule {
+  width: 40px;
+  height: 2px;
+  background: var(--accent);
+  margin: 0 auto 20px;
+}
+
+.layout-editorial-lux .ed-statement-inner h2 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(2.1rem, 5.5vw, 3.6rem);
+  text-transform: uppercase;
+  margin: 0 0 18px;
+  line-height: 1.05;
+}
+
+.layout-editorial-lux .ed-statement-body p {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.layout-editorial-lux .ed-statement-tag {
+  font-family: var(--body-font);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.layout-editorial-lux .ed-statement-link {
+  display: inline-block;
+  margin-top: 22px;
+  font-family: var(--body-font);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 2px;
+}
+
+/* ---- Responsive: la columna de caption pasa a apilarse abajo de la foto ---- */
+@media (max-width: 850px) {
+  .layout-editorial-lux.ed-detail {
+    flex-direction: column;
+  }
+
+  .layout-editorial-lux .ed-detail-image {
+    flex: 0 0 52vh;
+  }
+
+  .layout-editorial-lux .ed-detail-caption {
+    min-width: 0;
+    padding: 30px 24px;
+  }
+
+  .layout-editorial-lux .ed-detail-inset {
+    display: none;
+  }
+}

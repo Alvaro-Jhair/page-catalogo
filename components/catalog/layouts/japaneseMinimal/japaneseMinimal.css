@@ -1,0 +1,214 @@
+/* ───── Japanese Minimal ─────
+   Identidad: silencio, muchísimo espacio en blanco, imágenes chicas y
+   descentradas, un solo acento rojo (sello). La ausencia de ruido es
+   el lenguaje. Todo bajo .layout-japanese-minimal. */
+
+.layout-japanese-minimal {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.layout-japanese-minimal .reveal {
+  position: relative;
+  z-index: 2;
+}
+
+.layout-japanese-minimal .jp-mark {
+  position: absolute;
+  top: 34px;
+  right: 34px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  z-index: 3;
+}
+
+/* ---- Portada ---- */
+.layout-japanese-minimal.jp-cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 12%;
+  gap: 26px;
+}
+
+.layout-japanese-minimal .jp-cover-image {
+  position: relative;
+  align-self: flex-start;
+  width: 40%;
+  aspect-ratio: 3 / 4;
+}
+
+.layout-japanese-minimal .jp-cover-text {
+  align-self: flex-end;
+  text-align: right;
+  max-width: 60%;
+}
+
+.layout-japanese-minimal .jp-cover-text h1 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  letter-spacing: 0.06em;
+  margin: 0 0 8px;
+}
+
+.layout-japanese-minimal .jp-cover-text p {
+  font-family: var(--body-font);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.layout-japanese-minimal .jp-cover-meta {
+  align-self: flex-end;
+  font-family: var(--body-font);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+
+/* ---- Página de producto: texto primero ---- */
+.layout-japanese-minimal.jp-detail {
+  display: flex;
+  align-items: center;
+  gap: 6%;
+  padding: 0 8%;
+}
+
+.layout-japanese-minimal .jp-detail-text {
+  position: relative;
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.layout-japanese-minimal .jp-detail-text h3 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  letter-spacing: 0.05em;
+  margin: 20px 0 0;
+}
+
+.layout-japanese-minimal .jp-detail-type {
+  font-family: var(--body-font);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: -8px 0 0;
+}
+
+.layout-japanese-minimal .jp-detail-rule {
+  width: 1px;
+  height: 28px;
+  background: var(--accent);
+}
+
+.layout-japanese-minimal .jp-detail-desc p {
+  font-family: var(--body-font);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  line-height: 1.8;
+  color: var(--ink);
+  margin: 0;
+}
+
+.layout-japanese-minimal .jp-detail-price {
+  font-family: var(--body-font);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+}
+
+.layout-japanese-minimal .jp-detail-image {
+  position: relative;
+  flex: 1 1 34%;
+  aspect-ratio: 3 / 4;
+  align-self: flex-end;
+  margin-bottom: 10%;
+}
+
+/* ---- Statement (manifiesto / hero / capítulo / cierre) ---- */
+.layout-japanese-minimal.jp-statement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.layout-japanese-minimal .jp-statement-image {
+  position: relative;
+  width: 46%;
+  max-width: 340px;
+  aspect-ratio: 4 / 3;
+}
+
+.layout-japanese-minimal .jp-statement-inner h2 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+}
+
+.layout-japanese-minimal .jp-statement-body {
+  font-family: var(--body-font);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  line-height: 1.8;
+  color: var(--muted);
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.layout-japanese-minimal .jp-statement-link {
+  display: inline-block;
+  margin-top: 16px;
+  font-family: var(--body-font);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 2px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 700px) {
+  .layout-japanese-minimal.jp-cover {
+    padding: 0 8%;
+    gap: 18px;
+  }
+
+  .layout-japanese-minimal .jp-cover-image,
+  .layout-japanese-minimal .jp-cover-text,
+  .layout-japanese-minimal .jp-cover-meta {
+    align-self: center;
+    text-align: center;
+  }
+
+  .layout-japanese-minimal .jp-cover-image {
+    width: 62%;
+  }
+
+  .layout-japanese-minimal.jp-detail {
+    flex-direction: column;
+    padding: 60px 10% 40px;
+    gap: 24px;
+  }
+
+  .layout-japanese-minimal .jp-detail-image {
+    width: 55%;
+    flex: 0 0 auto;
+    align-self: center;
+    margin-bottom: 0;
+  }
+
+  .layout-japanese-minimal .jp-statement-image {
+    width: 62%;
+  }
+}

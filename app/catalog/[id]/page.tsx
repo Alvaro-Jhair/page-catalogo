@@ -20,7 +20,14 @@ export default async function CatalogPage({ params }: CatalogPageProps) {
 
   const entry = catalogs[id as CatalogId];
 
-  return <CatalogRenderer blocks={entry.blocks} theme={entry.theme} pdfHref={`/catalog-${id}.pdf`} />;
+  return (
+    <CatalogRenderer
+      blocks={entry.blocks}
+      theme={entry.theme}
+      layoutId={entry.layoutId}
+      pdfHref={`/catalog-${id}.pdf`}
+    />
+  );
 }
 
 export function generateStaticParams() {

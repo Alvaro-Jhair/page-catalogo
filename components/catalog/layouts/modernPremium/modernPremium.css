@@ -1,0 +1,229 @@
+/* ───── Modern Premium (catálogo de lujo contemporáneo) ─────
+   Identidad: split 50/50 duro, marcos con filete dorado, tipografía
+   serif + sans limpia. Todo bajo .layout-modern-premium. */
+
+.layout-modern-premium {
+  color: var(--ink);
+}
+
+.layout-modern-premium .reveal {
+  position: relative;
+  z-index: 2;
+}
+
+.layout-modern-premium .mp-gold-rule {
+  width: 46px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.layout-modern-premium .mp-eyebrow {
+  display: block;
+  font-family: var(--body-font);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+/* ---- Portada: split 50/50 ---- */
+.layout-modern-premium.mp-cover {
+  display: flex;
+  background: var(--paper);
+}
+
+.layout-modern-premium .mp-cover-panel {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 48px;
+}
+
+.layout-modern-premium .mp-cover-meta {
+  font-family: var(--body-font);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.layout-modern-premium .mp-cover-panel h1 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5.4vw, 4rem);
+  line-height: 1.03;
+  margin: 0;
+}
+
+.layout-modern-premium .mp-cover-panel p {
+  font-family: var(--body-font);
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.layout-modern-premium .mp-cover-photo {
+  position: relative;
+  flex: 0 0 50%;
+}
+
+.layout-modern-premium .mp-cover-bottom {
+  position: absolute;
+  left: 48px;
+  bottom: 34px;
+  font-family: var(--body-font);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* ---- Página de producto: contenido en marco + imágenes ---- */
+.layout-modern-premium.mp-detail {
+  display: flex;
+  background: var(--paper);
+}
+
+.layout-modern-premium .mp-detail-content {
+  flex: 0 0 42%;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.layout-modern-premium .mp-detail-frame {
+  width: 100%;
+  border: 1px solid var(--accent);
+  padding: 34px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.layout-modern-premium .mp-detail-frame h3 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  margin: 0;
+}
+
+.layout-modern-premium .mp-detail-type {
+  font-family: var(--body-font);
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: -6px 0 0;
+}
+
+.layout-modern-premium .mp-detail-desc p {
+  font-family: var(--body-font);
+  font-size: 0.85rem;
+  line-height: 1.65;
+  margin: 0 0 4px;
+}
+
+.layout-modern-premium .mp-detail-price {
+  font-family: var(--body-font);
+  font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.layout-modern-premium .mp-detail-price span {
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.layout-modern-premium .mp-detail-images {
+  flex: 1 1 58%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+}
+
+.layout-modern-premium .mp-image-cell {
+  position: relative;
+}
+
+/* ---- Statement (manifiesto / hero / capítulo / cierre) ---- */
+.layout-modern-premium.mp-statement {
+  display: flex;
+  align-items: center;
+  padding: 0 12%;
+  color: #fff;
+}
+
+.layout-modern-premium.mp-statement .mp-eyebrow {
+  color: var(--accent);
+}
+
+.layout-modern-premium .mp-statement-inner {
+  max-width: 560px;
+}
+
+.layout-modern-premium .mp-statement-inner h2 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(2rem, 4.6vw, 3.2rem);
+  margin: 16px 0 14px;
+  line-height: 1.06;
+}
+
+.layout-modern-premium .mp-statement-body {
+  font-family: var(--body-font);
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  line-height: 1.6;
+  color: #e8e8e4;
+  margin: 0;
+}
+
+.layout-modern-premium .mp-statement-link {
+  display: inline-block;
+  margin-top: 20px;
+  border-bottom: 1px solid var(--accent);
+  color: #fff;
+  font-family: var(--body-font);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-bottom: 3px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 850px) {
+  .layout-modern-premium.mp-cover {
+    flex-direction: column;
+  }
+
+  .layout-modern-premium .mp-cover-panel {
+    flex: 0 0 auto;
+    padding: 40px 28px 24px;
+  }
+
+  .layout-modern-premium .mp-cover-photo {
+    flex: 1 1 auto;
+  }
+
+  .layout-modern-premium .mp-cover-bottom {
+    left: 28px;
+  }
+
+  .layout-modern-premium.mp-detail {
+    flex-direction: column;
+  }
+
+  .layout-modern-premium .mp-detail-content {
+    flex: 0 0 auto;
+    padding: 30px 24px;
+  }
+
+  .layout-modern-premium .mp-detail-images {
+    flex: 1 1 auto;
+    grid-template-columns: repeat(3, 1fr);
+    min-height: 30vh;
+  }
+}

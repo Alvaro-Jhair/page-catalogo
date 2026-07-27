@@ -1,0 +1,241 @@
+/* ───── Nike Bold (campaña deportiva) ─────
+   Identidad: tipografía enorme con bloque de color detrás, numerales
+   gigantes, alto contraste, composición dinámica. Todo bajo
+   .layout-nike-bold. */
+
+.layout-nike-bold {
+  color: #fff;
+}
+
+.layout-nike-bold .reveal {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---- Portada ---- */
+.layout-nike-bold.nk-cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 36px 32px 56px;
+}
+
+.layout-nike-bold .nk-cover-meta {
+  position: absolute;
+  top: 30px;
+  left: 32px;
+  display: flex;
+  gap: 14px;
+  font-family: var(--body-font);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.layout-nike-bold .nk-cover-title h1 {
+  margin: 0 0 18px;
+  font-family: var(--display-font);
+  font-weight: 800;
+  font-size: clamp(3.2rem, 12vw, 8rem);
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  transform: rotate(-2.5deg);
+  transform-origin: left bottom;
+}
+
+.layout-nike-bold .nk-cover-title h1 span {
+  background: var(--accent);
+  color: #050505;
+  padding: 4px 14px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.layout-nike-bold .nk-cover-tagline {
+  font-family: var(--body-font);
+  font-weight: 700;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.layout-nike-bold .nk-cover-lines {
+  font-family: var(--body-font);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #cfcfcf;
+  margin: 0;
+}
+
+/* ---- Página de producto: hero + callout de precio ---- */
+.layout-nike-bold.nk-detail {
+  position: relative;
+  background: #000;
+}
+
+.layout-nike-bold .nk-detail-hero {
+  position: absolute;
+  inset: 0;
+}
+
+.layout-nike-bold .nk-detail-inset {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  width: 130px;
+  aspect-ratio: 3 / 4;
+  border: 3px solid #fff;
+}
+
+.layout-nike-bold .nk-detail-callout {
+  position: absolute;
+  left: 0;
+  bottom: 128px;
+  background: var(--accent);
+  color: #050505;
+  padding: 18px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 78%;
+}
+
+.layout-nike-bold .nk-detail-name {
+  font-family: var(--display-font);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.layout-nike-bold .nk-detail-type {
+  font-family: var(--body-font);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.layout-nike-bold .nk-detail-price {
+  font-family: var(--display-font);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+  margin-top: 4px;
+}
+
+.layout-nike-bold .nk-detail-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #050505;
+  padding: 20px 26px 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.layout-nike-bold .nk-detail-desc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--body-font);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #cfcfcf;
+}
+
+.layout-nike-bold .nk-detail-info .swatches {
+  margin: 0;
+}
+
+/* ---- Statement (manifiesto / hero / capítulo / cierre) ---- */
+.layout-nike-bold.nk-statement {
+  display: flex;
+  align-items: flex-end;
+  padding: 40px 34px 64px;
+}
+
+.layout-nike-bold .nk-statement-number {
+  position: absolute;
+  top: 6px;
+  right: 20px;
+  font-family: var(--display-font);
+  font-weight: 800;
+  font-size: clamp(5rem, 16vw, 11rem);
+  color: rgba(255, 255, 255, 0.14);
+  line-height: 1;
+}
+
+.layout-nike-bold .nk-statement-inner {
+  max-width: 620px;
+}
+
+.layout-nike-bold .nk-statement-kicker {
+  display: inline-block;
+  background: var(--accent);
+  color: #050505;
+  font-family: var(--body-font);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  margin-bottom: 14px;
+}
+
+.layout-nike-bold .nk-statement-inner h2 {
+  font-family: var(--display-font);
+  font-weight: 800;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  text-transform: uppercase;
+  line-height: 0.94;
+  margin: 0 0 12px;
+}
+
+.layout-nike-bold .nk-statement-body {
+  font-family: var(--body-font);
+  font-weight: 600;
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  color: #d8d8d8;
+  margin: 0;
+}
+
+.layout-nike-bold .nk-statement-link {
+  display: inline-block;
+  margin-top: 20px;
+  background: var(--accent);
+  color: #050505;
+  padding: 10px 18px;
+  font-family: var(--body-font);
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 700px) {
+  .layout-nike-bold .nk-detail-inset {
+    width: 90px;
+    top: 20px;
+    right: 20px;
+  }
+
+  .layout-nike-bold .nk-detail-callout {
+    bottom: 150px;
+    padding: 14px 18px;
+    max-width: 88%;
+  }
+
+  .layout-nike-bold .nk-detail-info {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 30px;
+  }
+}
