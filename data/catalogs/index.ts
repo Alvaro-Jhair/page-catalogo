@@ -7,12 +7,10 @@
 // imports, se reescribe completo a partir de la lista de ids.
 
 import { catalogEntry as entry0 } from "./ariel";
-import { catalogEntry as entry1 } from "./example";
 import type { CatalogEntry } from "../schema";
 
 export const catalogs = {
   "ariel": entry0,
-  "example": entry1,
 } satisfies Record<string, CatalogEntry>;
 
 export type CatalogId = keyof typeof catalogs;
