@@ -247,9 +247,11 @@ a {
 
 .collage {
   display: grid;
+  grid-auto-rows: 1fr;
   gap: 2px;
   background: #e8e4de;
-  flex-shrink: 0;
+  flex: 7 1 0;
+  min-height: 0;
 }
 
 .collage.four {
@@ -268,7 +270,6 @@ a {
   margin: 0;
   overflow: hidden;
   background: #ddd;
-  aspect-ratio: 3 / 4;
   position: relative;
 }
 
@@ -293,7 +294,8 @@ a {
   padding: 34px 42px 50px;
   position: relative;
   overflow: hidden;
-  flex: 1;
+  flex: 3 1 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -638,8 +640,12 @@ a {
        algunos visores de PDF en celular no componen bien esa capa y
        muestran un rectángulo sólido detrás del texto en vez del
        difuminado. Sin sombra en el PDF el texto sigue siendo legible
-       (ya tiene overlay oscuro detrás), así que se apaga solo acá. */
+       (ya tiene overlay oscuro detrás), así que se apaga solo acá.
+       Mismo problema con box-shadow (el swatch de color, .swatch):
+       queda un halo/cuadro visible alrededor en vez de una sombra
+       suave, así que se apaga por el mismo motivo. */
     text-shadow: none !important;
+    box-shadow: none !important;
   }
 
   .scroll-progress,
