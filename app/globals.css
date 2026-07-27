@@ -1,3 +1,33 @@
+/* Playfair Display, embebida como archivo propio en vez de cargarla de
+   Google Fonts en vivo (Google Fonts, SIL Open Font License, libre para
+   uso comercial). Varios temas de catálogo usan "Playfair Display" como
+   último fallback antes de "serif" (ej. Didot/Bodoni MT/Playfair
+   Display/serif) — en un navegador normal ese fallback casi nunca se
+   usa porque el sistema operativo ya tiene Didot/Bodoni MT/Palatino/
+   Georgia instalados, pero el Chromium que genera el PDF en Vercel
+   (@sparticuz/chromium) no trae NINGUNA de esas fuentes de sistema,
+   solo Open Sans — así que el título del PDF salía en una sans-serif
+   genérica en vez de una serif elegante, mientras la web (con las
+   fuentes del sistema del visitante) se veía bien. Con la fuente
+   embebida acá, "Playfair Display" existe siempre, en cualquier
+   Chromium, sin depender de qué tenga instalado el sistema operativo —
+   web y PDF quedan consistentes entre sí. */
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/PlayfairDisplay-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/PlayfairDisplay-Italic.woff2") format("woff2");
+}
+
 :root {
   --ink: #151515;
   --paper: #f8f6f2;

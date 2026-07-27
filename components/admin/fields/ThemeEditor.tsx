@@ -7,14 +7,20 @@ type ThemeEditorProps = {
   onChange: (theme: CatalogTheme) => void;
 };
 
-// Stacks curados de fuentes ya disponibles en el sistema (sin cargar
-// webfonts nuevas: este proyecto no tiene esa infraestructura) — control
+// Stacks curados de fuentes ya disponibles en el sistema — control
 // granular sobre qué combinación usar, no un color/fuente libre por
-// texto que podría no existir en el dispositivo del visitante.
+// texto que podría no existir en el dispositivo del visitante. Las 4
+// opciones serif terminan en "Playfair Display" antes de "serif": es
+// la única fuente que este proyecto sí embebe como archivo propio (ver
+// @font-face en app/globals.css) — el Chromium que genera el PDF en
+// Vercel no tiene Georgia/Times/Palatino/Didot instaladas (son fuentes
+// de sistema operativo, no del navegador), así que sin ese fallback el
+// título salía en una sans-serif genérica en el PDF aunque se viera
+// bien en la web de cualquier visitante con esas fuentes instaladas.
 const DISPLAY_FONTS: Record<string, string> = {
-  'Georgia, "Times New Roman", serif': "Serif clásica (Georgia)",
-  '"Times New Roman", Times, serif': "Serif editorial (Times)",
-  'Palatino, "Palatino Linotype", "Book Antiqua", serif': "Serif refinada (Palatino)",
+  'Georgia, "Times New Roman", "Playfair Display", serif': "Serif clásica (Georgia)",
+  '"Times New Roman", Times, "Playfair Display", serif': "Serif editorial (Times)",
+  'Palatino, "Palatino Linotype", "Book Antiqua", "Playfair Display", serif': "Serif refinada (Palatino)",
   'Didot, "Bodoni MT", "Playfair Display", serif': "Serif de moda (Didot)",
   'Futura, "Century Gothic", sans-serif': "Sans geométrica (Futura)",
 };

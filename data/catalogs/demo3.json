@@ -5,7 +5,7 @@
     "line": "#4a4a4a",
     "muted": "#8a8a85",
     "accent": "#3f6b8f",
-    "displayFont": "\"Times New Roman\", Times, serif",
+    "displayFont": "\"Times New Roman\", Times, \"Playfair Display\", serif",
     "bodyFont": "Verdana, Geneva, sans-serif"
   },
   "blocks": [

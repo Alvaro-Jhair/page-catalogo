@@ -6,7 +6,7 @@
     "line": "#262626",
     "muted": "#6f6a64",
     "accent": "#d5c8b7",
-    "displayFont": "Georgia, \"Times New Roman\", serif",
+    "displayFont": "Georgia, \"Times New Roman\", \"Playfair Display\", serif",
     "bodyFont": "Arial, Helvetica, sans-serif"
   },
   "blocks": [
