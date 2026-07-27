@@ -1,7 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import CatalogRenderer from "@/components/catalog/CatalogRenderer";
 import type { Block, CatalogTheme, LayoutId } from "@/data/schema";
 
@@ -18,21 +18,18 @@ type PreviewOverlayProps = {
  * para que lo que se ve acá sea exactamente lo que se publicaría.
  * Portal a document.body para escapar del <main> del panel (evita un
  * <main> anidado y que el scroll-snap del catálogo compita con el
- * layout del admin).
+ * layout del admin). Sin guard de "mounted": este componente solo se
+ * monta client-side, después de un clic en "Vista previa" (nunca
+ * durante el SSR), así que document.body ya existe en el primer render.
  */
 export default function PreviewOverlay({ blocks, theme, layoutId, onClose }: PreviewOverlayProps) {
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    setMounted(true);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prevOverflow;
     };
   }, []);
-
-  if (!mounted) return null;
 
   // Mismo cálculo que app/admin/actions.ts al guardar: la vista previa
   // tiene que mostrar los números de página reales (según el orden

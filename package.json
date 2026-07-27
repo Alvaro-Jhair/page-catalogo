@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build && node scripts/generate-pdf.mjs",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "postinstall": "playwright install chromium"
   },
   "dependencies": {
@@ -23,6 +23,8 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.12",
     "playwright": "^1.62.0",
     "typescript": "^5.9.3"
   }

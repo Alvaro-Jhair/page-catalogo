@@ -344,7 +344,7 @@ export const CATALOG_TEMPLATES: CatalogTemplate[] = [
         type: "cover",
         data: {
           title,
-          meta: ["SS26", "RUN", "DROP 01"],
+          meta: [year, "RUN", "DROP 01"],
           subtitle: "No rules. No quiet.",
           bottomLine1: `${title} COLLECTION`,
           bottomLine2: "Built for the run.",
@@ -411,7 +411,7 @@ export const CATALOG_TEMPLATES: CatalogTemplate[] = [
         type: "cover",
         data: {
           title,
-          meta: ["SS26", "No. 04"],
+          meta: [year, "No. 04"],
           subtitle: "Quiet confidence.",
           bottomLine1: title,
           bottomLine2: "Available now.",
@@ -535,7 +535,7 @@ export const CATALOG_TEMPLATES: CatalogTemplate[] = [
         type: "cover",
         data: {
           title,
-          meta: ["ZINE 01", "SS26", "NO SLEEP"],
+          meta: ["ZINE 01", year, "NO SLEEP"],
           subtitle: "Not for the algorithm.",
           bottomLine1: title,
           bottomLine2: "Available now.",
@@ -602,7 +602,7 @@ export const CATALOG_TEMPLATES: CatalogTemplate[] = [
         type: "cover",
         data: {
           title,
-          meta: ["A—01", "SS26", "No 07"],
+          meta: ["A—01", year, "No 07"],
           subtitle: "Form follows material.",
           bottomLine1: title,
           bottomLine2: "Available now.",
@@ -669,7 +669,7 @@ export const CATALOG_TEMPLATES: CatalogTemplate[] = [
         type: "cover",
         data: {
           title,
-          meta: ["SS26", "EDIT 09"],
+          meta: [year, "EDIT 09"],
           subtitle: "Contemporary, considered.",
           bottomLine1: title,
           bottomLine2: "Available now.",
