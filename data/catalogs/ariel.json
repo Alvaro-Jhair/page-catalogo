@@ -269,15 +269,5 @@
       "bgImage": "/imagenes/10.png",
       "pageNumber": 11
     }
-  },
-  {
-    "type": "productHero",
-    "data": {
-      "id": "",
-      "name": "",
-      "type": "",
-      "bgImage": "/imagenes/z6o6q2oojbfsxemfront5gf26m.jpg",
-      "pageNumber": 12
-    }
   }
 ]
