@@ -35,9 +35,9 @@ export async function saveCatalogAction(
   return saveCatalog(catalogId, { theme, blocks: withPageNumbers });
 }
 
-export async function createCatalogAction(name: string): Promise<CreateCatalogResult> {
+export async function createCatalogAction(name: string, templateId?: string): Promise<CreateCatalogResult> {
   await requireSession();
-  return createCatalog(name);
+  return createCatalog(name, templateId);
 }
 
 export async function deleteCatalogAction(id: string): Promise<DeleteCatalogResult> {

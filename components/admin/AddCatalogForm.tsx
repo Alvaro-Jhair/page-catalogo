@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { createCatalogAction } from "@/app/admin/actions";
+import { CATALOG_TEMPLATES } from "@/lib/newCatalog";
 
 /**
  * Crea un catálogo nuevo desde cero (contenido inicial armado por
@@ -15,6 +16,7 @@ import { createCatalogAction } from "@/app/admin/actions";
  */
 export default function AddCatalogForm() {
   const [name, setName] = useState("");
+  const [templateId, setTemplateId] = useState(CATALOG_TEMPLATES[0].id);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<{ id: string; commitUrl: string } | null>(null);
@@ -24,7 +26,7 @@ export default function AddCatalogForm() {
     setError(null);
     setCreated(null);
     startTransition(async () => {
-      const res = await createCatalogAction(name);
+      const res = await createCatalogAction(name, templateId);
       if (res.ok) {
         setName("");
         setCreated({ id: res.id, commitUrl: res.commitUrl });
@@ -37,6 +39,28 @@ export default function AddCatalogForm() {
   return (
     <div className="admin-add-catalog">
       <p className="admin-add-colorway-title">Agregar catálogo</p>
+
+      <div className="admin-template-carousel">
+        {CATALOG_TEMPLATES.map((template) => (
+          <button
+            type="button"
+            key={template.id}
+            className={`admin-template-card${template.id === templateId ? " selected" : ""}`}
+            onClick={() => setTemplateId(template.id)}
+          >
+            <div className="admin-template-card-swatches">
+              {[template.theme.ink, template.theme.paper, template.theme.line, template.theme.muted, template.theme.accent].map(
+                (color, i) => (
+                  <span key={i} style={{ background: color }} />
+                )
+              )}
+            </div>
+            <p className="admin-template-card-title">{template.label}</p>
+            <p className="admin-template-card-description">{template.description}</p>
+          </button>
+        ))}
+      </div>
+
       <div className="admin-add-catalog-fields">
         <input
           type="text"
@@ -49,8 +73,9 @@ export default function AddCatalogForm() {
         </button>
       </div>
       <p className="admin-image-picker-note">
-        Arranca con una estructura completa (portada, manifiesto, dos colorways, cierre) para editar encima — no
-        queda disponible para editar ni visible en el sitio hasta que Vercel termine de redesplegar.
+        Arranca con la estructura completa de la plantilla elegida (portada, manifiesto, colorways, cierre) para
+        editar encima — no queda disponible para editar ni visible en el sitio hasta que Vercel termine de
+        redesplegar.
       </p>
       {error && <p className="admin-save-message error">{error}</p>}
       {created && (

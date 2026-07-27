@@ -71,13 +71,13 @@ export async function saveCatalog(
  * más robusto que un patch de texto que se vuelve más frágil a medida
  * que crecen los catálogos.
  */
-export async function createCatalog(name: string): Promise<CreateCatalogResult> {
+export async function createCatalog(name: string, templateId?: string): Promise<CreateCatalogResult> {
   const trimmed = name.trim();
   if (!trimmed) {
     return { ok: false, error: "El catálogo necesita un nombre." };
   }
 
-  const { id, entry } = createStarterCatalog(trimmed);
+  const { id, entry } = createStarterCatalog(trimmed, templateId);
 
   const parsed = CatalogEntrySchema.safeParse(entry);
   if (!parsed.success) {
