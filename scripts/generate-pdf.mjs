@@ -99,6 +99,36 @@ async function main() {
       await page.waitForLoadState("networkidle");
       await sleep(200); // margen para que corra la transición de RevealOnScroll
     }
+    // El loop de arriba avanza en pasos fijos de un viewport, así que
+    // puede quedarse corto respecto al final real de la página si la
+    // altura total no es un múltiplo exacto — dejando la última sección
+    // sin disparar su observer. Se re-mide scrollHeight (puede haber
+    // crecido con el contenido ya cargado) y se fuerza un scroll
+    // explícito hasta ahí.
+    const finalScrollHeight = await page.evaluate(() => document.body.scrollHeight);
+    await page.evaluate((y) => window.scrollTo(0, y), finalScrollHeight);
+    await page.waitForLoadState("networkidle");
+    await sleep(300);
+
+    // No confiar solo en los sleep() de arriba: en un build real de
+    // Vercel (más lento/limitado que una máquina local) dos páginas
+    // completas salieron negras —imagen de fondo y texto ausentes—
+    // porque el margen fijo no alcanzó a cubrir la carga+decode de fotos
+    // de 1.5-2.6MB. Se espera explícitamente a que toda imagen haya
+    // terminado de cargar y todo bloque RevealOnScroll esté marcado
+    // visible, con un timeout generoso en vez de una espera a ciegas.
+    console.log("[generate-pdf] waiting for every image and reveal block to finish...");
+    await page.waitForFunction(
+      () => {
+        const images = Array.from(document.querySelectorAll("img"));
+        const imagesReady = images.every((img) => img.complete && img.naturalWidth > 0);
+        const reveals = Array.from(document.querySelectorAll(".reveal"));
+        const revealsReady = reveals.every((el) => el.classList.contains("visible"));
+        return imagesReady && revealsReady;
+      },
+      { timeout: 30000 }
+    );
+
     await page.evaluate(() => window.scrollTo(0, 0));
     await sleep(200);
 

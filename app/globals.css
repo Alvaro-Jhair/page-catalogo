@@ -241,12 +241,15 @@ a {
   background: #fff;
   color: #111;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .collage {
   display: grid;
   gap: 2px;
   background: #e8e4de;
+  flex-shrink: 0;
 }
 
 .collage.four {
@@ -290,6 +293,7 @@ a {
   padding: 34px 42px 50px;
   position: relative;
   overflow: hidden;
+  flex: 1;
 }
 
 .info-head {
