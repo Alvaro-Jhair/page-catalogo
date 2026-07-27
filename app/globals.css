@@ -630,6 +630,13 @@ a {
   * {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    /* text-shadow ayuda a leer texto sobre fotos en la web, pero
+       Chromium lo rasteriza como una imagen aparte al exportar a PDF —
+       algunos visores de PDF en celular no componen bien esa capa y
+       muestran un rectángulo sólido detrás del texto en vez del
+       difuminado. Sin sombra en el PDF el texto sigue siendo legible
+       (ya tiene overlay oscuro detrás), así que se apaga solo acá. */
+    text-shadow: none !important;
   }
 
   .scroll-progress,
