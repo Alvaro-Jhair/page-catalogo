@@ -1,0 +1,493 @@
+/* Hoja de estilos exclusiva del panel de administración. Deliberadamente
+   separada de app/globals.css: el panel es una herramienta interna, no
+   parte del lookbook público, y no debe heredar ni afectar su sistema
+   visual. */
+
+.admin-root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #1a1a1a;
+  background: #f4f4f2;
+  min-height: 100vh;
+}
+
+.admin-root * {
+  box-sizing: border-box;
+}
+
+/* ---- login ---- */
+
+.admin-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 340px;
+  background: #fff;
+  border: 1px solid #e2e2df;
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.admin-login-card h1 {
+  font-size: 1.1rem;
+  margin: 0 0 20px;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.admin-login-form input {
+  font-size: 0.95rem;
+  padding: 9px 10px;
+  border: 1px solid #d5d5d0;
+  border-radius: 5px;
+}
+
+.admin-login-form button {
+  margin-top: 6px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-login-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.admin-login-error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b3261e;
+}
+
+/* ---- dashboard shell ---- */
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e2e2df;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.admin-header h1 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.admin-btn {
+  padding: 8px 14px;
+  border-radius: 5px;
+  border: 1px solid #d5d5d0;
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #1a1a1a;
+}
+
+.admin-btn:hover {
+  background: #f0f0ee;
+}
+
+.admin-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.admin-btn-primary {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.admin-btn-primary:hover {
+  background: #333;
+}
+
+.admin-btn-danger {
+  color: #b3261e;
+  border-color: #f2c9c5;
+}
+
+.admin-btn-icon {
+  padding: 6px 9px;
+  line-height: 1;
+}
+
+/* ---- block list ---- */
+
+.admin-block-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.admin-block {
+  background: #fff;
+  border: 1px solid #e2e2df;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-block-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.admin-block-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #ecece8;
+  color: #444;
+  padding: 3px 8px;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+
+.admin-block-title {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+button.admin-block-title {
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  color: inherit;
+}
+
+.admin-block-controls {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.admin-block-form {
+  padding: 16px;
+  border-top: 1px solid #ececea;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---- fields ---- */
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #555;
+}
+
+.admin-field input[type="text"],
+.admin-field input[type="url"],
+.admin-field textarea,
+.admin-field select {
+  font-size: 0.9rem;
+  padding: 8px 9px;
+  border: 1px solid #d5d5d0;
+  border-radius: 5px;
+  font-family: inherit;
+  width: 100%;
+}
+
+.admin-field textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.admin-list-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-list-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-list-row input {
+  flex: 1;
+}
+
+.admin-swatch-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-swatch-row input[type="color"] {
+  width: 40px;
+  height: 34px;
+  padding: 2px;
+  border: 1px solid #d5d5d0;
+  border-radius: 5px;
+}
+
+.admin-collage-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: start;
+}
+
+.admin-collage-row > input[type="text"] {
+  margin-top: 26px; /* alinea con el input del ImagePicker vecino, que trae su propio renglón de arriba */
+}
+
+.admin-collage-row > .admin-btn-danger {
+  margin-top: 26px;
+}
+
+/* ---- add block ---- */
+
+.admin-add-block {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 14px;
+  background: #fff;
+  border: 1px dashed #c9c9c4;
+  border-radius: 8px;
+}
+
+.admin-add-block select {
+  flex: 1;
+  padding: 8px 9px;
+  border: 1px solid #d5d5d0;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+/* ---- add colorway (template) ---- */
+
+.admin-add-colorway {
+  padding: 14px;
+  margin-bottom: 10px;
+  background: #fff;
+  border: 1px dashed #c9c9c4;
+  border-radius: 8px;
+}
+
+.admin-add-colorway-title {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #444;
+}
+
+.admin-add-colorway-fields {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) auto;
+  gap: 8px;
+}
+
+.admin-add-colorway-fields input {
+  padding: 8px 9px;
+  border: 1px solid #d5d5d0;
+  border-radius: 5px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 720px) {
+  .admin-add-colorway-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- save bar ---- */
+
+.admin-save-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e2df;
+}
+
+.admin-save-message {
+  font-size: 0.85rem;
+}
+
+.admin-save-message.ok {
+  color: #1e7a34;
+}
+
+.admin-save-message.error {
+  color: #b3261e;
+}
+
+.admin-save-issues {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 0.78rem;
+  color: #b3261e;
+}
+
+/* ---- image picker ---- */
+
+.admin-image-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-image-picker-row input[type="text"] {
+  flex: 1;
+}
+
+.admin-image-picker-preview {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #ececea;
+  border: 1px solid #d5d5d0;
+}
+
+.admin-image-picker-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-image-picker-note {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  color: #6a6a64;
+}
+
+/* ---- asset gallery modal ---- */
+
+.admin-gallery-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  padding: 24px;
+}
+
+.admin-gallery {
+  width: 100%;
+  max-width: 640px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #ececea;
+}
+
+.admin-gallery-header p {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.admin-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.admin-gallery-item {
+  aspect-ratio: 1;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  background: #ececea;
+}
+
+.admin-gallery-item.selected {
+  border-color: #1a1a1a;
+}
+
+.admin-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-gallery-upload {
+  padding: 14px 16px;
+  border-top: 1px solid #ececea;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
