@@ -6,15 +6,17 @@
 // agrega un catálogo desde el panel — no editar a mano el orden de
 // imports, se reescribe completo a partir de la lista de ids.
 
-import { catalogEntry as entry0 } from "./ariel";
-import { catalogEntry as entry1 } from "./lux";
-import { catalogEntry as entry2 } from "./apple";
+import { catalogEntry as entry0 } from "./apple";
+import { catalogEntry as entry1 } from "./ariel";
+import { catalogEntry as entry2 } from "./lux";
+import { catalogEntry as entry3 } from "./mawoa";
 import type { CatalogEntry } from "../schema";
 
 export const catalogs = {
-  "ariel": entry0,
-  "lux": entry1,
-  "apple": entry2,
+  "apple": entry0,
+  "ariel": entry1,
+  "lux": entry2,
+  "mawoa": entry3,
 } satisfies Record<string, CatalogEntry>;
 
 export type CatalogId = keyof typeof catalogs;
