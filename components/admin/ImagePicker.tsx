@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 import { useAssets, type ClientAsset } from "./AssetsContext";
 import { uploadAssetAction, replaceAssetAction, recordDriveLinkAction } from "@/app/admin/actions";
-import { CLOUD_SOURCES } from "@/lib/cloudSources";
+import { CLOUD_SOURCES, type CloudSource } from "@/lib/cloudSources";
+import type { DriveLink } from "@/lib/driveLinks";
 import { useToast } from "./ToastContext";
 
 type ImagePickerProps = {
@@ -41,6 +42,7 @@ export default function ImagePicker({ label, value, onChange }: ImagePickerProps
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [justUploaded, setJustUploaded] = useState(false);
   const [syncingPath, setSyncingPath] = useState<string | null>(null);
+  const [cloudLoadingId, setCloudLoadingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentPreview = assets.find((a) => a.path === value)?.previewUrl;
@@ -65,6 +67,60 @@ export default function ImagePicker({ label, value, onChange }: ImagePickerProps
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  /**
+   * Importar desde un CloudSource (Google Drive) directo en este campo
+   * — antes solo existía en el wizard de creación (StepImages.tsx);
+   * misma lógica reusada acá para poder traer una foto nueva de Drive
+   * al editar un catálogo ya existente, no solo al crearlo. Selecciona
+   * la primera imagen importada en el campo, igual que subir un archivo
+   * local.
+   */
+  const importFromCloud = async (source: CloudSource) => {
+    setUploadError(null);
+    setCloudLoadingId(source.id);
+    try {
+      const picked = await source.pickImages();
+      if (picked.length === 0) return; // canceló sin elegir nada, no es un error
+      let firstPath: string | null = null;
+      for (const file of picked) {
+        const res = await uploadAssetAction(file.name, file.base64);
+        if (!res.ok) {
+          setUploadError(res.error);
+          continue;
+        }
+        let driveLink: DriveLink | undefined;
+        if (source.resyncFile) {
+          const linkResult = await recordDriveLinkAction(
+            res.path,
+            source.id as DriveLink["provider"],
+            file.sourceFileId,
+            file.name
+          );
+          if (linkResult.ok) {
+            driveLink = {
+              path: res.path,
+              provider: source.id as DriveLink["provider"],
+              fileId: file.sourceFileId,
+              fileName: file.name,
+              lastSyncedAt: new Date().toISOString(),
+            };
+          }
+        }
+        addAsset({ path: res.path, filename: res.path.split("/").pop() ?? file.name, previewUrl: file.previewUrl, driveLink });
+        firstPath = firstPath ?? res.path;
+      }
+      if (firstPath) {
+        onChange(firstPath);
+        setJustUploaded(true);
+        setOpen(false);
+      }
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : `No se pudo importar desde ${source.label}.`);
+    } finally {
+      setCloudLoadingId(null);
     }
   };
 
@@ -190,6 +246,21 @@ export default function ImagePicker({ label, value, onChange }: ImagePickerProps
                   hidden
                 />
               </label>
+              {CLOUD_SOURCES.map((source) => {
+                const configured = source.isConfigured();
+                return (
+                  <button
+                    key={source.id}
+                    type="button"
+                    className="admin-btn"
+                    onClick={() => importFromCloud(source)}
+                    disabled={!configured || cloudLoadingId !== null}
+                    title={configured ? undefined : source.unconfiguredReason?.()}
+                  >
+                    {cloudLoadingId === source.id ? "Importando…" : `Importar desde ${source.label}`}
+                  </button>
+                );
+              })}
               {uploadError && <p className="admin-save-message error">{uploadError}</p>}
             </div>
           </div>
