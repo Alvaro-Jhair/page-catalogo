@@ -1,6 +1,6 @@
 import "server-only";
 
-const GITHUB_API = "https://api.github.com";
+const GITHUB_GRAPHQL_API = "https://api.github.com/graphql";
 
 /**
  * El sitio se genera estático (Next build + Vercel): no hay filesystem
@@ -20,106 +20,133 @@ function getGitHubConfig() {
     );
   }
 
-  return { token, repo, branch };
+  const [owner, name] = repo.split("/");
+  if (!owner || !name) {
+    throw new Error(`GITHUB_REPO tiene que tener el formato "owner/repo" (valor actual: "${repo}").`);
+  }
+
+  return { token, repo, owner, name, branch };
 }
 
-async function githubRequest(path: string, token: string, init?: RequestInit) {
-  const res = await fetch(`${GITHUB_API}${path}`, {
-    ...init,
+type GraphQLResponse<T> = { data?: T; errors?: { message: string }[] };
+
+/**
+ * Un solo punto de entrada a la API GraphQL de GitHub (v4), que
+ * reemplaza la Git Data API (blob -> tree -> commit -> mover ref, 4
+ * llamadas REST encadenadas) por una única mutación (`createCommitOnBranch`,
+ * ver más abajo) y una única query para leer el estado que hace falta
+ * antes de comitear. Perf (fase de optimización, 2026-07-28): la Git
+ * Data API tomaba 6-7 round-trips secuenciales por operación; esto lo
+ * baja a 1-2.
+ */
+async function githubGraphQL<T>(query: string, variables: Record<string, unknown>, token: string): Promise<T> {
+  const res = await fetch(GITHUB_GRAPHQL_API, {
+    method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      ...(init?.headers ?? {}),
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({ query, variables }),
   });
 
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    throw new Error(`GitHub API respondió ${res.status}: ${body}`);
+    throw new Error(`GitHub GraphQL API respondió ${res.status}: ${body}`);
   }
 
-  return res.json();
+  const json = (await res.json()) as GraphQLResponse<T>;
+  if (json.errors?.length) {
+    throw new Error(`GitHub GraphQL API devolvió errores: ${json.errors.map((e) => e.message).join("; ")}`);
+  }
+  if (!json.data) {
+    throw new Error("GitHub GraphQL API no devolvió datos.");
+  }
+  return json.data;
 }
 
-export type CommitFileResult = { commitUrl: string };
+const HEAD_OID_QUERY = `
+  query($owner: String!, $name: String!, $qualifiedRef: String!) {
+    repository(owner: $owner, name: $name) {
+      ref(qualifiedName: $qualifiedRef) {
+        target { oid }
+      }
+    }
+  }
+`;
+
+async function getHeadOid(owner: string, name: string, branch: string, token: string): Promise<string> {
+  const data = await githubGraphQL<{
+    repository: { ref: { target: { oid: string } } | null } | null;
+  }>(HEAD_OID_QUERY, { owner, name, qualifiedRef: `refs/heads/${branch}` }, token);
+
+  const oid = data.repository?.ref?.target.oid;
+  if (!oid) {
+    throw new Error(`No se encontró la rama "${branch}" en el repo.`);
+  }
+  return oid;
+}
+
+const CREATE_COMMIT_MUTATION = `
+  mutation($input: CreateCommitOnBranchInput!) {
+    createCommitOnBranch(input: $input) {
+      commit { url oid }
+    }
+  }
+`;
+
+export type CommitFileResult = { commitUrl: string; headOid: string };
 /** `base64Content: null` borra ese path del repo en vez de crearlo/reemplazarlo. */
 export type CommitFileInput = { path: string; base64Content: string | null };
 
 /**
  * Comitea uno o más archivos (texto o binario) al repo en un solo
- * commit, vía la Git Data API (blobs -> un tree -> commit -> mover la
- * rama), no la API de "contenidos" simple — esa tiene un límite de 1MB
- * por archivo, y las fotos reales de este catálogo pesan 1.5-2.6MB. La
- * Git Data API no tiene ese techo, y sirve igual de bien para el JSON
- * (chico) de un catálogo, así que todo el proyecto comitea por este
- * único camino. Crear (o borrar) un catálogo toca 3 archivos a la vez
- * (su JSON, su loader .ts, y el registro actualizado) — de ahí que esto
- * acepte una lista en vez de un solo archivo: son varios blobs pero un
- * único tree/commit, así que nunca queda el repo a medio camino si algo
- * falla. `base64Content: null` en un archivo lo borra del repo en vez
- * de crearlo/reemplazarlo (así es como borrar un catálogo saca su JSON
- * y su loader del árbol en el mismo commit que regenera el registro).
+ * commit, vía la mutación GraphQL `createCommitOnBranch` — hace en una
+ * sola llamada lo que la Git Data API necesitaba 4 (blob, tree, commit,
+ * mover el ref), y firma el commit automáticamente. `expectedHeadOid`
+ * (opcional) evita una query extra cuando el llamador ya lo tiene a
+ * mano (ver `listRepoJsonFileIds`, que lo trae junto con el listado que
+ * ya necesita pedir); si no se pasa, se pide acá mismo. GitHub rechaza
+ * la mutación si `expectedHeadOid` quedó desactualizado — la misma
+ * protección contra condiciones de carrera que antes se hacía a mano
+ * releyendo el ref, ahora la garantiza el servidor.
  *
- * Nota: cada llamada mueve la rama a un commit nuevo basado en el HEAD
- * *en ese momento* — dos llamadas concurrentes podrían pisarse. Alcance
- * suficiente para un solo administrador editando de a un cambio por vez;
- * si hiciera falta more concurrencia, acá es donde se agregaría un
- * reintento con el ref actualizado.
+ * Crear (o borrar) un catálogo toca 3 archivos a la vez (su JSON, su
+ * loader .ts, y el registro actualizado) — de ahí que esto acepte una
+ * lista en vez de un solo archivo: quedan en un único commit, así que
+ * nunca queda el repo a medio camino si algo falla.
  */
 export async function commitFiles(
   files: CommitFileInput[],
-  message: string
+  message: string,
+  opts?: { expectedHeadOid?: string }
 ): Promise<CommitFileResult> {
-  const { token, repo, branch } = getGitHubConfig();
+  const { token, repo, owner, name, branch } = getGitHubConfig();
 
-  // 1. Un blob por archivo con contenido nuevo — los que se borran
-  // (base64Content: null) no necesitan blob, van directo al tree con
-  // sha: null, que es como la Git Data API marca "sacar este path".
-  const toCreate = files.filter((f) => f.base64Content !== null);
-  const blobs = await Promise.all(
-    toCreate.map((file) =>
-      githubRequest(`/repos/${repo}/git/blobs`, token, {
-        method: "POST",
-        body: JSON.stringify({ content: file.base64Content, encoding: "base64" }),
-      })
-    )
+  const expectedHeadOid = opts?.expectedHeadOid ?? (await getHeadOid(owner, name, branch, token));
+
+  const additions = files
+    .filter((f): f is { path: string; base64Content: string } => f.base64Content !== null)
+    .map((f) => ({ path: f.path, contents: f.base64Content }));
+  const deletions = files.filter((f) => f.base64Content === null).map((f) => ({ path: f.path }));
+
+  const fileChanges: { additions?: typeof additions; deletions?: typeof deletions } = {};
+  if (additions.length) fileChanges.additions = additions;
+  if (deletions.length) fileChanges.deletions = deletions;
+
+  const data = await githubGraphQL<{ createCommitOnBranch: { commit: { url: string; oid: string } } }>(
+    CREATE_COMMIT_MUTATION,
+    {
+      input: {
+        branch: { repositoryNameWithOwner: repo, branchName: branch },
+        message: { headline: message },
+        fileChanges,
+        expectedHeadOid,
+      },
+    },
+    token
   );
-  const blobShaByPath = new Map(toCreate.map((file, i) => [file.path, blobs[i].sha]));
 
-  // 2. HEAD actual de la rama -> su commit -> el tree base sobre el que construir.
-  const ref = await githubRequest(`/repos/${repo}/git/ref/heads/${branch}`, token);
-  const baseCommitSha = ref.object.sha;
-  const baseCommit = await githubRequest(`/repos/${repo}/git/commits/${baseCommitSha}`, token);
-  const baseTreeSha = baseCommit.tree.sha;
-
-  // 3. Tree nuevo: el base más estos archivos (agregados, reemplazados o borrados).
-  const tree = await githubRequest(`/repos/${repo}/git/trees`, token, {
-    method: "POST",
-    body: JSON.stringify({
-      base_tree: baseTreeSha,
-      tree: files.map((file) => ({
-        path: file.path,
-        mode: "100644",
-        type: "blob",
-        sha: file.base64Content === null ? null : blobShaByPath.get(file.path),
-      })),
-    }),
-  });
-
-  // 4. Commit apuntando al tree nuevo, con el HEAD anterior como padre.
-  const commit = await githubRequest(`/repos/${repo}/git/commits`, token, {
-    method: "POST",
-    body: JSON.stringify({ message, tree: tree.sha, parents: [baseCommitSha] }),
-  });
-
-  // 5. Mover la rama al commit nuevo — esto es lo que dispara el deploy.
-  await githubRequest(`/repos/${repo}/git/refs/heads/${branch}`, token, {
-    method: "PATCH",
-    body: JSON.stringify({ sha: commit.sha }),
-  });
-
-  return { commitUrl: commit.html_url };
+  return { commitUrl: data.createCommitOnBranch.commit.url, headOid: data.createCommitOnBranch.commit.oid };
 }
 
 /** Caso particular de {@link commitFiles} para un solo archivo. */
@@ -130,6 +157,8 @@ export async function commitFile(
 ): Promise<CommitFileResult> {
   return commitFiles([{ path, base64Content }], message);
 }
+
+export type RepoDirState = { ids: string[]; headOid: string };
 
 /**
  * Lista los archivos `.json` directamente dentro de `dirPath` en el
@@ -142,14 +171,43 @@ export async function commitFile(
  * apuntando a un catálogo que el primer commit ya había borrado,
  * rompiendo el build. Consultar GitHub antes de regenerar el registro
  * es lo que evita que se repita.
+ *
+ * Devuelve también `headOid` (mismo `oid` que usaría una query aparte
+ * para pedirlo) — así `createCatalog`/`deleteCatalog` pueden pasárselo
+ * directo a `commitFiles({ expectedHeadOid })` en vez de que la
+ * mutación tenga que volver a pedirlo: 1 query acá + 1 mutación allá,
+ * no 2 queries + 1 mutación.
  */
-export async function listRepoJsonFileIds(dirPath: string): Promise<string[]> {
-  const { token, repo, branch } = getGitHubConfig();
-  const items = await githubRequest(
-    `/repos/${repo}/contents/${dirPath}?ref=${encodeURIComponent(branch)}`,
+export async function listRepoJsonFileIds(dirPath: string): Promise<RepoDirState> {
+  const { token, owner, name, branch } = getGitHubConfig();
+
+  const data = await githubGraphQL<{
+    repository: {
+      ref: { target: { oid: string } } | null;
+      object: { entries: { name: string; type: string }[] } | null;
+    } | null;
+  }>(
+    `query($owner: String!, $name: String!, $qualifiedRef: String!, $expr: String!) {
+      repository(owner: $owner, name: $name) {
+        ref(qualifiedName: $qualifiedRef) { target { oid } }
+        object(expression: $expr) {
+          ... on Tree { entries { name type } }
+        }
+      }
+    }`,
+    { owner, name, qualifiedRef: `refs/heads/${branch}`, expr: `${branch}:${dirPath}` },
     token
   );
-  return items
-    .filter((item: { type: string; name: string }) => item.type === "file" && item.name.endsWith(".json"))
-    .map((item: { name: string }) => item.name.replace(/\.json$/, ""));
+
+  const oid = data.repository?.ref?.target.oid;
+  if (!oid) {
+    throw new Error(`No se encontró la rama "${branch}" en el repo.`);
+  }
+
+  const entries = data.repository?.object?.entries ?? [];
+  const ids = entries
+    .filter((item) => item.type === "blob" && item.name.endsWith(".json"))
+    .map((item) => item.name.replace(/\.json$/, ""));
+
+  return { ids, headOid: oid };
 }

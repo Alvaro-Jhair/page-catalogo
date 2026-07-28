@@ -1,7 +1,7 @@
 import "server-only";
 import { CatalogEntrySchema, type CatalogEntry } from "@/data/schema";
 import { commitFile, commitFiles, listRepoJsonFileIds } from "./github";
-import { createStarterCatalog } from "./newCatalog";
+import { slugify } from "./slug";
 
 const CATALOGS_DIR = "data/catalogs";
 
@@ -61,30 +61,37 @@ export async function saveCatalog(
 }
 
 /**
- * Crea un catálogo nuevo desde cero: arma su contenido inicial
- * (lib/newCatalog.ts), valida contra el schema y comitea 3 archivos en
- * un solo commit atómico (`commitFiles`) — el JSON del catálogo, su
- * loader .ts, y el registro `data/catalogs/index.ts` regenerado con el
- * id nuevo agregado. Regenerar el registro entero (en vez de intentar
- * parchear el archivo existente) es deliberado: es un archivo corto y
- * completamente derivable de la lista de ids, así que reescribirlo es
- * más robusto que un patch de texto que se vuelve más frágil a medida
- * que crecen los catálogos.
+ * Crea un catálogo nuevo: valida `candidateEntry` (armado del lado del
+ * cliente por el wizard de 3 pasos — lib/newCatalog.ts's
+ * createStarterCatalog + applyImageOverrides + las ediciones de texto
+ * del Paso 3, todo en memoria, sin red hasta este punto) contra el
+ * schema y comitea 3 archivos en un solo commit atómico (`commitFiles`)
+ * — el JSON del catálogo, su loader .ts, y el registro
+ * `data/catalogs/index.ts` regenerado con el id nuevo agregado.
+ * Regenerar el registro entero (en vez de intentar parchear el archivo
+ * existente) es deliberado: es un archivo corto y completamente
+ * derivable de la lista de ids, así que reescribirlo es más robusto
+ * que un patch de texto que se vuelve más frágil a medida que crecen
+ * los catálogos.
+ *
+ * `id` nunca se usa tal cual llega — siempre se re-normaliza con
+ * `slugify` server-side, sea cual sea el valor que mandó el cliente
+ * (incluso si el wizard ya lo mandó "limpio"): termina en una ruta de
+ * archivo real dentro del repo, así que confiar ciegamente en un
+ * string armado en el cliente sería una vía de path traversal.
  */
-export async function createCatalog(name: string, templateId?: string): Promise<CreateCatalogResult> {
-  const trimmed = name.trim();
-  if (!trimmed) {
-    return { ok: false, error: "El catálogo necesita un nombre." };
+export async function createCatalog(id: string, candidateEntry: unknown): Promise<CreateCatalogResult> {
+  const trimmedId = slugify(id);
+  if (!trimmedId) {
+    return { ok: false, error: "El catálogo necesita un id válido." };
   }
 
-  const { id, entry } = createStarterCatalog(trimmed, templateId);
-
-  const parsed = CatalogEntrySchema.safeParse(entry);
+  const parsed = CatalogEntrySchema.safeParse(candidateEntry);
   if (!parsed.success) {
-    // No debería pasar nunca en la práctica (el contenido lo arma
-    // createStarterCatalog, no un formulario libre) — chequeo de
-    // seguridad, no validación de input real.
-    return { ok: false, error: "El contenido inicial no calza con el modelo de datos del catálogo." };
+    return {
+      ok: false,
+      error: "El contenido no calza con el modelo de datos del catálogo.",
+    };
   }
 
   try {
@@ -92,22 +99,24 @@ export async function createCatalog(name: string, templateId?: string): Promise<
     // tiene cargado este proceso — ese solo está tan fresco como el
     // último deploy que terminó, y regenerar el registro a partir de
     // datos viejos ya rompió un build una vez (ver nota en
-    // listRepoJsonFileIds).
-    const existingIds = await listRepoJsonFileIds(CATALOGS_DIR);
-    if (existingIds.includes(id)) {
-      return { ok: false, error: `Ya existe un catálogo con el id "${id}".` };
+    // listRepoJsonFileIds). La misma llamada ya trae el headOid actual,
+    // así que el commit de abajo no necesita pedirlo de nuevo.
+    const { ids: existingIds, headOid } = await listRepoJsonFileIds(CATALOGS_DIR);
+    if (existingIds.includes(trimmedId)) {
+      return { ok: false, error: `Ya existe un catálogo con el id "${trimmedId}".` };
     }
-    const allIds = [...existingIds, id];
+    const allIds = [...existingIds, trimmedId];
 
     const { commitUrl } = await commitFiles(
       [
-        { path: catalogFilePath(id), base64Content: toBase64(jsonFileContent(parsed.data)) },
-        { path: `data/catalogs/${id}.ts`, base64Content: toBase64(catalogLoaderSource(id)) },
+        { path: catalogFilePath(trimmedId), base64Content: toBase64(jsonFileContent(parsed.data)) },
+        { path: `data/catalogs/${trimmedId}.ts`, base64Content: toBase64(catalogLoaderSource(trimmedId)) },
         { path: `data/catalogs/index.ts`, base64Content: toBase64(registryIndexSource(allIds)) },
       ],
-      `catalog(${id}): crear catálogo "${trimmed}" desde el panel de administración`
+      `catalog(${trimmedId}): crear catálogo desde el panel de administración`,
+      { expectedHeadOid: headOid }
     );
-    return { ok: true, id, commitUrl };
+    return { ok: true, id: trimmedId, commitUrl };
   } catch (err) {
     return {
       ok: false,
@@ -129,8 +138,8 @@ export async function deleteCatalog(id: string): Promise<DeleteCatalogResult> {
   try {
     // Mismo motivo que en createCatalog: la lista de ids sale de
     // GitHub en vivo, no del registro que ya tiene cargado este
-    // proceso.
-    const existingIds = await listRepoJsonFileIds(CATALOGS_DIR);
+    // proceso — y trae el headOid actual de regalo.
+    const { ids: existingIds, headOid } = await listRepoJsonFileIds(CATALOGS_DIR);
     if (!existingIds.includes(id)) {
       return { ok: false, error: `No existe un catálogo con el id "${id}".` };
     }
@@ -146,7 +155,8 @@ export async function deleteCatalog(id: string): Promise<DeleteCatalogResult> {
         { path: `data/catalogs/${id}.ts`, base64Content: null },
         { path: `data/catalogs/index.ts`, base64Content: toBase64(registryIndexSource(remainingIds)) },
       ],
-      `catalog(${id}): eliminar catálogo desde el panel de administración`
+      `catalog(${id}): eliminar catálogo desde el panel de administración`,
+      { expectedHeadOid: headOid }
     );
     return { ok: true, commitUrl };
   } catch (err) {

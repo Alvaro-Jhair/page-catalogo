@@ -1,9 +1,12 @@
 import { requireSession } from "@/lib/session";
 import { catalogs } from "@/data/catalogs";
 import type { Block, CatalogBlocks } from "@/data/schema";
+import { listAssets } from "@/lib/assets";
+import { listDriveLinks } from "@/lib/driveLinks";
 import LogoutButton from "@/components/admin/LogoutButton";
-import AddCatalogForm from "@/components/admin/AddCatalogForm";
+import CreateCatalogWizard from "@/components/admin/wizard/CreateCatalogWizard";
 import CatalogList from "@/components/admin/CatalogList";
+import { AssetsProvider } from "@/components/admin/AssetsContext";
 
 function getCoverBlock(blocks: CatalogBlocks) {
   return blocks.find((b): b is Extract<Block, { type: "cover" }> => b.type === "cover");
@@ -23,9 +26,14 @@ export default async function AdminPage() {
     title: getCoverBlock(entry.blocks)?.data.title || id,
     blockCount: entry.blocks.length,
   }));
+  // El wizard reusa BlockForm (Paso 3), que usa ImagePicker por dentro
+  // — antes de esto /admin nunca necesitó AssetsProvider porque
+  // AddCatalogForm no tenía ningún campo de imagen.
+  const assets = await listAssets();
+  const driveLinks = await listDriveLinks();
 
   return (
-    <>
+    <AssetsProvider initialAssets={assets} initialDriveLinks={driveLinks}>
       <header className="admin-header">
         <h1>Panel de administración</h1>
         <div className="admin-header-actions">
@@ -34,8 +42,8 @@ export default async function AdminPage() {
       </header>
       <main className="admin-main">
         <CatalogList catalogs={items} />
-        <AddCatalogForm />
+        <CreateCatalogWizard />
       </main>
-    </>
+    </AssetsProvider>
   );
 }

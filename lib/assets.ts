@@ -84,3 +84,28 @@ export async function uploadAsset(
     return { ok: false, error: err instanceof Error ? err.message : "Error desconocido al subir la imagen." };
   }
 }
+
+/**
+ * Re-sube el contenido de una imagen que ya existe, a la misma ruta
+ * (overwrite intencional) — a diferencia de uploadAsset(), acá el
+ * destino ya se conoce de antes (viene de un vínculo con Drive, ver
+ * lib/driveLinks.ts) así que no hace falta sanitizar el nombre ni
+ * desambiguar colisiones.
+ */
+export async function replaceAsset(path: string, base64Content: string): Promise<UploadAssetResult> {
+  const ext = extensionOf(path);
+  if (!ALLOWED_EXTENSIONS.has(ext)) {
+    return { ok: false, error: `Formato no soportado: .${ext || "?"}. Usá jpg, png, webp o gif.` };
+  }
+
+  try {
+    const { commitUrl } = await commitFile(
+      `public${path}`,
+      base64Content,
+      `assets: actualizar ${path} desde Google Drive`
+    );
+    return { ok: true, path, commitUrl };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Error desconocido al actualizar la imagen." };
+  }
+}

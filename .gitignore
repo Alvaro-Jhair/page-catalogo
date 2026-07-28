@@ -28,3 +28,5 @@ Page-catalogo.zip
 
 # generado en cada build (scripts/generate-pdf.mjs) — no es fuente, se regenera solo
 public/catalog-*.pdf
+.vercel
+.env*

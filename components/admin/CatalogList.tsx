@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { deleteCatalogAction } from "@/app/admin/actions";
+import { useConfirm } from "./ConfirmDialogContext";
+import { useToast } from "./ToastContext";
 
 export type CatalogListItem = {
   id: string;
@@ -28,11 +30,19 @@ export default function CatalogList({ catalogs }: CatalogListProps) {
   const [error, setError] = useState<string | null>(null);
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const [, startTransition] = useTransition();
+  const confirm = useConfirm();
+  const { showToast } = useToast();
 
   const visible = catalogs.filter((c) => !deletedIds.includes(c.id));
 
-  const handleDelete = (id: string) => {
-    if (!confirm(`¿Eliminar el catálogo "${id}"? No se puede deshacer.`)) return;
+  const handleDelete = async (id: string) => {
+    const ok = await confirm({
+      title: "Eliminar catálogo",
+      message: `¿Eliminar el catálogo "${id}"? No se puede deshacer.`,
+      confirmLabel: "Eliminar",
+      danger: true,
+    });
+    if (!ok) return;
     setError(null);
     setPendingId(id);
     startTransition(async () => {
@@ -40,6 +50,7 @@ export default function CatalogList({ catalogs }: CatalogListProps) {
       setPendingId(null);
       if (res.ok) {
         setDeletedIds((prev) => [...prev, id]);
+        showToast(`Catálogo "${id}" eliminado`);
       } else {
         setError(res.error);
       }

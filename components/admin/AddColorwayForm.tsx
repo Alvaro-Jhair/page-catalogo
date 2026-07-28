@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createColorwayBlocks } from "@/lib/templates";
 import type { Block } from "@/data/schema";
 import ImagePicker from "./ImagePicker";
+import { useToast } from "./ToastContext";
 
 type AddColorwayFormProps = {
   defaultProductName: string;
@@ -28,6 +29,7 @@ export default function AddColorwayForm({
   const [bgImage, setBgImage] = useState("/imagenes/1.png");
   const [swatchType, setSwatchType] = useState<"image" | "color">("image");
   const [swatchColor, setSwatchColor] = useState("#cccccc");
+  const { showToast } = useToast();
 
   const canAdd = colorwayName.trim().length > 0;
 
@@ -42,6 +44,7 @@ export default function AddColorwayForm({
         swatch: swatchType === "color" ? { type: "color", color: swatchColor } : { type: "image" },
       })
     );
+    showToast(`Colorway "${colorwayName}" agregada`);
     setColorwayName("");
   };
 

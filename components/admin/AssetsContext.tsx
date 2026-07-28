@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Asset } from "@/lib/assets";
+import type { DriveLink } from "@/lib/driveLinks";
 
 /**
  * `previewUrl` (un blob: URL local) solo se completa para una imagen
@@ -9,8 +10,11 @@ import type { Asset } from "@/lib/assets";
  * archivo no va a existir de verdad en /imagenes/ hasta el próximo
  * redeploy de Vercel, así que sin esto el admin vería un ícono roto
  * justo después de subir su propia foto.
+ *
+ * `driveLink` (Fase F) está presente cuando la imagen vino de Google
+ * Drive — habilita el badge + botón de re-sync en ImagePicker.
  */
-export type ClientAsset = Asset & { previewUrl?: string };
+export type ClientAsset = Asset & { previewUrl?: string; driveLink?: DriveLink };
 
 type AssetsContextValue = {
   assets: ClientAsset[];
@@ -28,12 +32,17 @@ const AssetsContext = createContext<AssetsContextValue | null>(null);
  */
 export function AssetsProvider({
   initialAssets,
+  initialDriveLinks = [],
   children,
 }: {
   initialAssets: Asset[];
+  initialDriveLinks?: DriveLink[];
   children: ReactNode;
 }) {
-  const [assets, setAssets] = useState<ClientAsset[]>(initialAssets);
+  const [assets, setAssets] = useState<ClientAsset[]>(() => {
+    const linksByPath = new Map(initialDriveLinks.map((link) => [link.path, link]));
+    return initialAssets.map((asset) => ({ ...asset, driveLink: linksByPath.get(asset.path) }));
+  });
 
   const addAsset = (asset: ClientAsset) => {
     setAssets((prev) => [asset, ...prev.filter((a) => a.path !== asset.path)]);

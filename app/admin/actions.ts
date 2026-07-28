@@ -9,7 +9,8 @@ import {
   type CreateCatalogResult,
   type DeleteCatalogResult,
 } from "@/lib/catalogStore";
-import { uploadAsset, type UploadAssetResult } from "@/lib/assets";
+import { uploadAsset, replaceAsset, type UploadAssetResult } from "@/lib/assets";
+import { upsertDriveLink, type UpsertDriveLinkResult, type DriveLink } from "@/lib/driveLinks";
 import type { Block, CatalogTheme, LayoutId } from "@/data/schema";
 
 /**
@@ -38,9 +39,9 @@ export async function saveCatalogAction(
   return saveCatalog(catalogId, { layoutId, theme, blocks: withPageNumbers });
 }
 
-export async function createCatalogAction(name: string, templateId?: string): Promise<CreateCatalogResult> {
+export async function createCatalogAction(id: string, candidateEntry: unknown): Promise<CreateCatalogResult> {
   await requireSession();
-  return createCatalog(name, templateId);
+  return createCatalog(id, candidateEntry);
 }
 
 export async function deleteCatalogAction(id: string): Promise<DeleteCatalogResult> {
@@ -54,4 +55,19 @@ export async function uploadAssetAction(
 ): Promise<UploadAssetResult> {
   await requireSession();
   return uploadAsset(filename, base64Content);
+}
+
+export async function replaceAssetAction(path: string, base64Content: string): Promise<UploadAssetResult> {
+  await requireSession();
+  return replaceAsset(path, base64Content);
+}
+
+export async function recordDriveLinkAction(
+  path: string,
+  provider: DriveLink["provider"],
+  fileId: string,
+  fileName: string
+): Promise<UpsertDriveLinkResult> {
+  await requireSession();
+  return upsertDriveLink({ path, provider, fileId, fileName, lastSyncedAt: new Date().toISOString() });
 }

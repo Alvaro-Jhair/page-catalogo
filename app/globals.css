@@ -525,6 +525,13 @@ a {
 
   .cover-title h1 {
     font-size: clamp(2rem, 10vw, 3.6rem);
+    /* En pantallas angostas títulos largos (ej. "ANGEL DE CANELA") envuelven
+       a 2 líneas — el margin-bottom de 14px de la regla base alcanza para
+       un título de 1 línea, pero con 2 la segunda línea queda pegada al
+       meta de abajo (VOL.01 / 2026 / LOOKBOOK). Más margen + line-height
+       explícito para que la propia altura de línea no lo achique más. */
+    line-height: 1.15;
+    margin-bottom: 22px;
   }
 
   .cover-bottom {

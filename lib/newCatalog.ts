@@ -1,5 +1,6 @@
 import type { Block, CatalogEntry, CatalogTheme, ChapterHero, LayoutId, ProductVariant } from "@/data/schema";
 import { slugify } from "./slug";
+import { createColorwayBlocks } from "./templates";
 
 export type NewCatalogResult = { id: string; entry: CatalogEntry };
 
@@ -718,6 +719,142 @@ export const CATALOG_TEMPLATES: CatalogTemplate[] = [
   },
 ];
 
+function isColorwayPairAt(blocks: Block[], i: number): boolean {
+  const current = blocks[i];
+  const next = blocks[i + 1];
+  return (
+    current?.type === "chapterHero" &&
+    next?.type === "productDetail" &&
+    current.data.id !== "" &&
+    current.data.id === next.data.id
+  );
+}
+
+/** Cuántas colorways (pares capítulo+detalle) tiene ya armadas una plantilla — usado por el wizard para inicializar/acotar el selector de cantidad. */
+export function countColorwayPairs(blocks: Block[]): number {
+  let count = 0;
+  for (let i = 0; i < blocks.length; i++) {
+    if (isColorwayPairAt(blocks, i)) {
+      count++;
+      i++; // saltar el segundo bloque del par ya contado
+    }
+  }
+  return count;
+}
+
+/**
+ * Ajusta la cantidad de colorways de una plantilla ya armada (Paso 1
+ * del wizard de creación, 2026-07-28): de menos, recorta las últimas;
+ * de más, agrega genéricas reusando la última foto/nombre de producto
+ * autoral vía el mismo composer que ya usa "Agregar colorway" en el
+ * editor (`createColorwayBlocks`) — nunca toca cover/manifiesto/hero/
+ * cierre. No cambia nada si `count` ya calza con lo que la plantilla
+ * trae de fábrica.
+ */
+function adjustColorwayCount(blocks: Block[], count: number, theme: CatalogTheme): Block[] {
+  const before: Block[] = [];
+  const pairs: [Block, Block][] = [];
+  const after: Block[] = [];
+
+  for (let i = 0; i < blocks.length; ) {
+    if (isColorwayPairAt(blocks, i)) {
+      pairs.push([blocks[i], blocks[i + 1]]);
+      i += 2;
+    } else if (pairs.length === 0) {
+      before.push(blocks[i]);
+      i += 1;
+    } else {
+      after.push(blocks[i]);
+      i += 1;
+    }
+  }
+
+  if (pairs.length === 0 || count === pairs.length) return blocks;
+
+  let adjustedPairs = pairs;
+  if (count < pairs.length) {
+    adjustedPairs = pairs.slice(0, Math.max(1, count));
+  } else {
+    const heroBlock = before.find(
+      (b): b is Extract<Block, { type: "productHero" }> => b.type === "productHero"
+    );
+    const lastChapter = pairs[pairs.length - 1][0] as Extract<Block, { type: "chapterHero" }>;
+    const productName = heroBlock?.data.name ?? lastChapter.data.name;
+    const productType = heroBlock?.data.type ?? "";
+
+    const extra: [Block, Block][] = [];
+    for (let n = pairs.length + 1; n <= count; n++) {
+      extra.push(
+        createColorwayBlocks({
+          colorwayName: `Colorway ${n}`,
+          productName,
+          productType,
+          bgImage: lastChapter.data.bgImage,
+          swatch: { type: "color", color: theme.accent },
+        })
+      );
+    }
+    adjustedPairs = [...pairs, ...extra];
+  }
+
+  return [...before, ...adjustedPairs.flat(), ...after];
+}
+
+/**
+ * Cuántos "espacios de foto" tiene un catálogo armado, en el mismo
+ * orden en que Paso 2 del wizard los va a llenar (portada, manifiesto,
+ * hero, y por cada colorway: fondo del capítulo + cada foto del
+ * collage, cierre) — puramente informativo, para mostrarle al admin
+ * cuántas fotos puede aprovechar antes de que el resto quede con las
+ * de muestra de la plantilla.
+ */
+export function imageSlotCount(blocks: Block[]): number {
+  let count = 0;
+  for (const block of blocks) {
+    if (block.type === "productDetail") {
+      count += block.data.collageImages.length;
+    } else {
+      // cover, manifesto, productHero, chapterHero, closing: 1 slot (bgImage) cada uno
+      count += 1;
+    }
+  }
+  return count;
+}
+
+/**
+ * Reemplaza los fondos/fotos de collage de un catálogo armado con las
+ * fotos que el admin subió en el Paso 2 del wizard, en orden de
+ * aparición (portada, manifiesto, hero, cada colorway, cierre) —
+ * `images` puede traer menos fotos que espacios tiene la plantilla; los
+ * espacios que sobran quedan con la foto de muestra original. Nunca
+ * toca swatches (esas se siguen editando a mano en el Paso 3, ya que
+ * suelen ser un recorte específico, no la misma foto de fondo).
+ */
+export function applyImageOverrides(blocks: Block[], images: string[]): Block[] {
+  if (images.length === 0) return blocks;
+  let i = 0;
+  const next = (fallback: string): string => (i < images.length ? images[i++] : fallback);
+
+  return blocks.map((block): Block => {
+    switch (block.type) {
+      case "cover":
+      case "manifesto":
+      case "productHero":
+      case "chapterHero":
+      case "closing":
+        return { ...block, data: { ...block.data, bgImage: next(block.data.bgImage) } } as Block;
+      case "productDetail":
+        return {
+          ...block,
+          data: {
+            ...block.data,
+            collageImages: block.data.collageImages.map((img) => ({ ...img, src: next(img.src) })),
+          },
+        };
+    }
+  });
+}
+
 /**
  * Arma el contenido inicial de un catálogo nuevo a partir de una
  * plantilla elegida en el carrusel del admin (`templateId`; si no
@@ -726,19 +863,28 @@ export const CATALOG_TEMPLATES: CatalogTemplate[] = [
  * admin edite fotos/texto encima en vez de armar cada bloque desde
  * cero. Usa las fotos que ya existen en public/imagenes/ como
  * placeholder (son las únicas disponibles hasta que el admin suba las
- * suyas vía el picker de assets).
+ * suyas vía el picker de assets). `colorwayCount` es opcional (Paso 1
+ * del wizard, 2026-07-28): sin especificar, se usa tal cual la trae la
+ * plantilla — comportamiento idéntico al de antes de esa fecha.
  */
-export function createStarterCatalog(name: string, templateId?: string): NewCatalogResult {
+export function createStarterCatalog(
+  name: string,
+  templateId?: string,
+  colorwayCount?: number
+): NewCatalogResult {
   const id = slugify(name) || `catalogo-${Date.now()}`;
   const title = name.toUpperCase().trim();
   const year = new Date().getFullYear().toString();
 
   const template = CATALOG_TEMPLATES.find((t) => t.id === templateId) ?? CATALOG_TEMPLATES[0];
+  const baseBlocks = template.build(title, id, year);
+  const blocks =
+    colorwayCount === undefined ? baseBlocks : adjustColorwayCount(baseBlocks, colorwayCount, template.theme);
 
   const entry: CatalogEntry = {
     layoutId: template.layoutId,
     theme: template.theme,
-    blocks: template.build(title, id, year),
+    blocks,
   };
 
   return { id, entry };

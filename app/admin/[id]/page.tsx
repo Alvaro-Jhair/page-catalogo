@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { catalogs, type CatalogId } from "@/data/catalogs";
 import { listAssets } from "@/lib/assets";
+import { listDriveLinks } from "@/lib/driveLinks";
 import AdminEditor from "@/components/admin/AdminEditor";
 import LogoutButton from "@/components/admin/LogoutButton";
 import { AssetsProvider } from "@/components/admin/AssetsContext";
@@ -22,26 +23,24 @@ export default async function AdminCatalogPage({ params }: AdminCatalogPageProps
 
   const entry = catalogs[id as CatalogId];
   const assets = await listAssets();
+  const driveLinks = await listDriveLinks();
 
   return (
-    <AssetsProvider initialAssets={assets}>
-      <header className="admin-header">
-        <h1>Panel de administración — {id}</h1>
-        <div className="admin-header-actions">
-          <Link href="/admin" className="admin-btn">
-            ← Catálogos
-          </Link>
-          <LogoutButton />
-        </div>
-      </header>
-      <main className="admin-main">
-        <AdminEditor
-          catalogId={id}
-          initialBlocks={entry.blocks}
-          initialTheme={entry.theme}
-          layoutId={entry.layoutId}
-        />
-      </main>
+    <AssetsProvider initialAssets={assets} initialDriveLinks={driveLinks}>
+      <AdminEditor
+        catalogId={id}
+        initialBlocks={entry.blocks}
+        initialTheme={entry.theme}
+        layoutId={entry.layoutId}
+        topbarActions={
+          <>
+            <Link href="/admin" className="admin-btn">
+              ← Catálogos
+            </Link>
+            <LogoutButton />
+          </>
+        }
+      />
     </AssetsProvider>
   );
 }

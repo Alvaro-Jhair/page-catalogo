@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import type { Block } from "@/data/schema";
 import BlockForm from "./BlockForm";
+import { useConfirm } from "./ConfirmDialogContext";
 
 /**
  * `key` es un identificador sintético, solo para React/la UI del panel
@@ -49,6 +50,7 @@ type BlockListProps = {
 
 export default function BlockList({ items, onChange }: BlockListProps) {
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
+  const confirm = useConfirm();
 
   const moveUp = (i: number) => {
     if (i === 0) return;
@@ -64,8 +66,8 @@ export default function BlockList({ items, onChange }: BlockListProps) {
     onChange(next);
   };
 
-  const remove = (i: number) => {
-    if (!confirm("¿Quitar este bloque del catálogo?")) return;
+  const remove = async (i: number) => {
+    if (!(await confirm({ message: "¿Quitar este bloque del catálogo?", confirmLabel: "Quitar", danger: true }))) return;
     onChange(items.filter((_, idx) => idx !== i));
   };
 

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactNode } from "react";
 import type { Block, CatalogTheme, LayoutId } from "@/data/schema";
 import BlockList, { type EditableBlock } from "./BlockList";
 import AddColorwayForm from "./AddColorwayForm";
-import PreviewOverlay from "./PreviewOverlay";
+import AdminPanel from "./AdminPanel";
 import ThemeEditor from "./fields/ThemeEditor";
+import { useToast } from "./ToastContext";
 import { saveCatalogAction } from "@/app/admin/actions";
 
 const BLOCK_TYPES: Block["type"][] = [
@@ -79,11 +80,19 @@ type AdminEditorProps = {
   initialTheme: CatalogTheme;
   /** Fijo al crear el catálogo (ver lib/newCatalog.ts) — no hay campo para editarlo acá a propósito: cambiarlo después podría dejar contenido que no calza con los supuestos visuales del layout nuevo. */
   layoutId: LayoutId;
+  /** Acciones que tienen que seguir alcanzables aunque el panel esté colapsado (volver al listado, cerrar sesión) — vienen de app/admin/[id]/page.tsx, que sí sabe de <Link>/LogoutButton. */
+  topbarActions?: ReactNode;
 };
 
 type SaveResult = Awaited<ReturnType<typeof saveCatalogAction>>;
 
-export default function AdminEditor({ catalogId, initialBlocks, initialTheme, layoutId }: AdminEditorProps) {
+export default function AdminEditor({
+  catalogId,
+  initialBlocks,
+  initialTheme,
+  layoutId,
+  topbarActions,
+}: AdminEditorProps) {
   const [items, setItems] = useState<EditableBlock[]>(() =>
     initialBlocks.map((block) => ({ key: makeKey(), block }))
   );
@@ -91,10 +100,12 @@ export default function AdminEditor({ catalogId, initialBlocks, initialTheme, la
   const [newType, setNewType] = useState<Block["type"]>("productDetail");
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<SaveResult | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(true);
+  const { showToast } = useToast();
 
   const addBlock = () => {
     setItems([...items, { key: makeKey(), block: defaultBlockFor(newType) }]);
+    showToast(`${TYPE_LABELS[newType]} agregado`);
   };
 
   const addColorway = (blocks: [Block, Block]) => {
@@ -117,11 +128,20 @@ export default function AdminEditor({ catalogId, initialBlocks, initialTheme, la
         layoutId
       );
       setResult(res);
+      if (res.ok) showToast("Guardado ✓");
     });
   };
 
   return (
-    <>
+    <AdminPanel
+      blocks={items.map((item) => item.block)}
+      theme={theme}
+      layoutId={layoutId}
+      title={catalogId}
+      topbarActions={topbarActions}
+      open={panelOpen}
+      onOpenChange={setPanelOpen}
+    >
       <ThemeEditor theme={theme} onChange={setTheme} />
 
       <BlockList items={items} onChange={setItems} />
@@ -146,10 +166,6 @@ export default function AdminEditor({ catalogId, initialBlocks, initialTheme, la
       </div>
 
       <div className="admin-save-bar">
-        <button type="button" className="admin-btn" onClick={() => setPreviewOpen(true)}>
-          Vista previa
-        </button>
-
         <button
           type="button"
           className="admin-btn admin-btn-primary"
@@ -180,15 +196,6 @@ export default function AdminEditor({ catalogId, initialBlocks, initialTheme, la
             </div>
           ))}
       </div>
-
-      {previewOpen && (
-        <PreviewOverlay
-          blocks={items.map((item) => item.block)}
-          theme={theme}
-          layoutId={layoutId}
-          onClose={() => setPreviewOpen(false)}
-        />
-      )}
-    </>
+    </AdminPanel>
   );
 }
