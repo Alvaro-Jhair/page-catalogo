@@ -9,7 +9,6 @@ import {
   type CreateCatalogResult,
   type DeleteCatalogResult,
 } from "@/lib/catalogStore";
-import { uploadAsset, replaceAsset, type UploadAssetResult } from "@/lib/assets";
 import { upsertDriveLink, type UpsertDriveLinkResult, type DriveLink } from "@/lib/driveLinks";
 import type { Block, CatalogTheme, LayoutId } from "@/data/schema";
 
@@ -47,19 +46,6 @@ export async function createCatalogAction(id: string, candidateEntry: unknown): 
 export async function deleteCatalogAction(id: string): Promise<DeleteCatalogResult> {
   await requireSession();
   return deleteCatalog(id);
-}
-
-export async function uploadAssetAction(
-  filename: string,
-  base64Content: string
-): Promise<UploadAssetResult> {
-  await requireSession();
-  return uploadAsset(filename, base64Content);
-}
-
-export async function replaceAssetAction(path: string, base64Content: string): Promise<UploadAssetResult> {
-  await requireSession();
-  return replaceAsset(path, base64Content);
 }
 
 export async function recordDriveLinkAction(

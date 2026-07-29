@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { uploadAssetAction, recordDriveLinkAction } from "@/app/admin/actions";
+import { recordDriveLinkAction } from "@/app/admin/actions";
+import { uploadFile } from "@/lib/uploadClient";
 import { useAssets } from "../AssetsContext";
 import { CLOUD_SOURCES, type CloudSource } from "@/lib/cloudSources";
 import type { DriveLink } from "@/lib/driveLinks";
@@ -14,19 +15,10 @@ type StepImagesProps = {
   slotCount: number;
 };
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string).split(",")[1] ?? "");
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
-
 /**
  * Paso 2 del wizard: arrastrar, pegar (Ctrl+V) o elegir archivos — las
- * tres formas suben por el mismo `uploadAssetAction` que ya usa
- * ImagePicker en el editor (mismo commit real a GitHub, mismas
+ * tres formas suben por el mismo `uploadFile` (lib/uploadClient.ts) que
+ * ya usa ImagePicker en el editor (mismo commit real a GitHub, mismas
  * validaciones de extensión/nombre). Las miniaturas se pueden
  * reordenar arrastrándolas: es la única excepción deliberada al Non
  * Goal de "no drag-and-drop" de este proyecto — ese Non Goal apunta a
@@ -52,8 +44,7 @@ export default function StepImages({ images, onChange, slotCount }: StepImagesPr
     const uploaded: WizardImage[] = [];
     for (const file of imageFiles) {
       try {
-        const base64 = await fileToBase64(file);
-        const res = await uploadAssetAction(file.name, base64);
+        const res = await uploadFile(file);
         if (res.ok) {
           const previewUrl = URL.createObjectURL(file);
           uploaded.push({ path: res.path, previewUrl });
@@ -69,10 +60,10 @@ export default function StepImages({ images, onChange, slotCount }: StepImagesPr
     setUploading(false);
   };
 
-  // Cada foto elegida en el picker del proveedor ya llega con sus bytes
-  // (base64) y una previewUrl propia (lib/cloudSources/*) — de ahí en
-  // más sube exactamente igual que un archivo local: mismo
-  // uploadAssetAction, mismo commit real a GitHub.
+  // Cada foto elegida en el picker del proveedor ya llega con su Blob y
+  // una previewUrl propia (lib/cloudSources/*) — de ahí en más sube
+  // exactamente igual que un archivo local: mismo uploadFile, mismo
+  // commit real a GitHub.
   const importFromCloud = async (source: CloudSource) => {
     setError(null);
     setCloudLoadingId(source.id);
@@ -81,7 +72,7 @@ export default function StepImages({ images, onChange, slotCount }: StepImagesPr
       if (picked.length === 0) return; // canceló sin elegir nada, no es un error
       const uploaded: WizardImage[] = [];
       for (const file of picked) {
-        const res = await uploadAssetAction(file.name, file.base64);
+        const res = await uploadFile(new File([file.blob], file.name, { type: file.blob.type }));
         if (res.ok) {
           uploaded.push({ path: res.path, previewUrl: file.previewUrl });
           // Vínculo con el archivo de origen (Fase F) — solo si este

@@ -15,13 +15,23 @@ import { verifySessionToken, SESSION_COOKIE_NAME } from "./auth";
  * en vez de confiar en que el proxy ya filtró todo.
  */
 export async function requireSession(): Promise<{ username: string }> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-  const session = token ? await verifySessionToken(token) : null;
+  const session = await getSession();
 
   if (!session) {
     redirect("/admin/login");
   }
 
   return session;
+}
+
+/**
+ * Igual que requireSession(), pero sin redirect() — pensado para Route
+ * Handlers (app/api/admin/upload/route.ts) que responden con JSON a un
+ * fetch(), no con una navegación de página: ahí un redirect() se vería
+ * como una respuesta HTML confusa en vez de un 401 claro.
+ */
+export async function getSession(): Promise<{ username: string } | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  return token ? await verifySessionToken(token) : null;
 }

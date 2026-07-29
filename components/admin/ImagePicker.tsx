@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { useAssets, type ClientAsset } from "./AssetsContext";
-import { uploadAssetAction, replaceAssetAction, recordDriveLinkAction } from "@/app/admin/actions";
+import { recordDriveLinkAction } from "@/app/admin/actions";
+import { uploadFile, replaceFile } from "@/lib/uploadClient";
 import { CLOUD_SOURCES, type CloudSource } from "@/lib/cloudSources";
 import type { DriveLink } from "@/lib/driveLinks";
 import { useToast } from "./ToastContext";
@@ -13,18 +14,6 @@ type ImagePickerProps = {
   value: string;
   onChange: (value: string) => void;
 };
-
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.slice(result.indexOf(",") + 1)); // saca el prefijo "data:...;base64,"
-    };
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
 
 /**
  * Campo de imagen con tres formas de completarlo: escribir la ruta a
@@ -52,8 +41,7 @@ export default function ImagePicker({ label, value, onChange }: ImagePickerProps
     setUploadError(null);
     setJustUploaded(false);
     try {
-      const base64 = await fileToBase64(file);
-      const result = await uploadAssetAction(file.name, base64);
+      const result = await uploadFile(file);
       if (result.ok) {
         addAsset({ path: result.path, filename: result.path.split("/").pop() ?? file.name, previewUrl: URL.createObjectURL(file) });
         onChange(result.path);
@@ -86,7 +74,7 @@ export default function ImagePicker({ label, value, onChange }: ImagePickerProps
       if (picked.length === 0) return; // canceló sin elegir nada, no es un error
       let firstPath: string | null = null;
       for (const file of picked) {
-        const res = await uploadAssetAction(file.name, file.base64);
+        const res = await uploadFile(new File([file.blob], file.name, { type: file.blob.type }));
         if (!res.ok) {
           setUploadError(res.error);
           continue;
@@ -140,8 +128,8 @@ export default function ImagePicker({ label, value, onChange }: ImagePickerProps
 
     setSyncingPath(asset.path);
     try {
-      const { base64, previewUrl } = await source.resyncFile(link.fileId);
-      const uploadResult = await replaceAssetAction(asset.path, base64);
+      const { blob, previewUrl } = await source.resyncFile(link.fileId);
+      const uploadResult = await replaceFile(asset.path, blob, link.fileName);
       if (!uploadResult.ok) {
         showToast(uploadResult.error, "error");
         return;

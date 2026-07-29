@@ -7,8 +7,15 @@
  */
 export type CloudPickedFile = {
   name: string;
-  /** Contenido en base64 (sin el prefijo "data:...;base64,"), listo para uploadAssetAction — mismo formato que un archivo local. */
-  base64: string;
+  /**
+   * El contenido crudo, no base64 — se sube vía el Route Handler
+   * (app/api/admin/upload/route.ts) como multipart/form-data, no como
+   * argumento de un Server Action (fix, 2026-07-28: un string base64 de
+   * varios MB — típico en una foto real de Drive sin optimizar — choca
+   * con un límite interno de React mucho antes de llegar al límite de
+   * tamaño ya configurado).
+   */
+  blob: Blob;
   /** blob: URL local para mostrar la miniatura antes de que la próxima build sirva el archivo real. */
   previewUrl: string;
   /** Id del archivo en el proveedor de origen — se guarda como vínculo (lib/driveLinks.ts) para poder re-sincronizar más tarde (Fase F). */
@@ -29,5 +36,5 @@ export type CloudSource = {
    * completo (Fase F) — opcional porque un proveedor futuro podría no
    * soportar re-sync.
    */
-  resyncFile?: (fileId: string) => Promise<{ base64: string; previewUrl: string }>;
+  resyncFile?: (fileId: string) => Promise<{ blob: Blob; previewUrl: string }>;
 };

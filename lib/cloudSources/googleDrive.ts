@@ -105,7 +105,7 @@ function getAccessToken(): Promise<string> {
   });
 }
 
-async function downloadFile(fileId: string, accessToken: string): Promise<{ base64: string; previewUrl: string }> {
+async function downloadFile(fileId: string, accessToken: string): Promise<{ blob: Blob; previewUrl: string }> {
   const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
@@ -114,13 +114,7 @@ async function downloadFile(fileId: string, accessToken: string): Promise<{ base
   }
   const blob = await res.blob();
   const previewUrl = URL.createObjectURL(blob);
-  const base64 = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string).split(",")[1] ?? "");
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(blob);
-  });
-  return { base64, previewUrl };
+  return { blob, previewUrl };
 }
 
 async function pickImages(): Promise<CloudPickedFile[]> {
@@ -161,8 +155,8 @@ async function pickImages(): Promise<CloudPickedFile[]> {
   for (const doc of selectedDocs) {
     const fileId = doc[window.google.picker.Document.ID] as string;
     const name = (doc[window.google.picker.Document.NAME] as string) || `drive-${fileId}.jpg`;
-    const { base64, previewUrl } = await downloadFile(fileId, accessToken);
-    files.push({ name, base64, previewUrl, sourceFileId: fileId });
+    const { blob, previewUrl } = await downloadFile(fileId, accessToken);
+    files.push({ name, blob, previewUrl, sourceFileId: fileId });
   }
   return files;
 }
@@ -173,7 +167,7 @@ async function pickImages(): Promise<CloudPickedFile[]> {
  * está guardado en el vínculo (lib/driveLinks.ts) desde la importación
  * original.
  */
-async function resyncFile(fileId: string): Promise<{ base64: string; previewUrl: string }> {
+async function resyncFile(fileId: string): Promise<{ blob: Blob; previewUrl: string }> {
   await loadGoogleScripts();
   const accessToken = await getAccessToken();
   return downloadFile(fileId, accessToken);
