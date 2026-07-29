@@ -20,6 +20,22 @@ export type SwatchItem = z.infer<typeof SwatchItemSchema>;
 export const CollageLayoutSchema = z.enum(["four", "three", "two", "one"]);
 export type CollageLayout = z.infer<typeof CollageLayoutSchema>;
 
+/**
+ * Cuántas fotos espera cada layout (fix, 2026-07-29) — `"four"` fija su
+ * grilla mobile a 2 columnas (`app/globals.css`), pensada para 4 fotos
+ * (2 filas de 2); cargar más de las esperadas no rompe nada en
+ * desktop (simplemente agrega filas) pero en mobile duplica la altura
+ * del collage y empuja el resto de la sección fuera de la pantalla —
+ * ver `components/catalog/Collage.tsx`, que recorta a este número en
+ * vez de confiar en que el contenido siempre venga bien contado.
+ */
+export const COLLAGE_LAYOUT_IMAGE_COUNT: Record<CollageLayout, number> = {
+  four: 4,
+  three: 3,
+  two: 2,
+  one: 1,
+};
+
 export const CollageImageSchema = z.object({
   src: z.string(),
   alt: z.string(),
