@@ -58,7 +58,7 @@
           "OPEN-BACK TIE DETAIL",
           "COLOURWAYS: IVORY · EMERALD · NOIR · GOLD"
         ],
-        "collageLayout": "four",
+        "collageLayout": "two",
         "collageImages": [
           {
             "src": "/imagenes/1.png",
@@ -67,36 +67,18 @@
           {
             "src": "/imagenes/4.png",
             "alt": "Ariel ivory beach back"
-          },
-          {
-            "src": "/imagenes/1.png",
-            "alt": ""
-          },
-          {
-            "src": "/imagenes/6.png",
-            "alt": ""
           }
         ],
         "swatches": [
           {
-            "label": "Ivory",
-            "type": "image",
-            "image": "/imagenes/1.png"
-          },
-          {
-            "label": "Emerald",
-            "type": "image",
-            "image": "/imagenes/4.png"
-          },
-          {
             "label": "Noir",
-            "type": "image",
-            "image": "/imagenes/6.png"
+            "type": "color",
+            "color": "#000000"
           },
           {
-            "label": "Gold",
-            "type": "image",
-            "image": "/imagenes/8.png"
+            "label": "verde",
+            "type": "color",
+            "color": "#117c03"
           }
         ]
       }
