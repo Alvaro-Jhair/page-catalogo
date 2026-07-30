@@ -21,8 +21,8 @@
         "subtitle": "Designed to disappear into your day.",
         "bottomLine1": "APPLE",
         "bottomLine2": "Available now.",
-        "bgImage": "/imagenes/apple-minimal/1.jpg",
-        "pageNumber": 0
+        "bgImage": "/imagenes/1.png",
+        "pageNumber": 1
       }
     },
     {
@@ -30,8 +30,8 @@
       "data": {
         "heading": "Simplicity, considered.",
         "paragraph": "Nothing extra. Nothing missing.",
-        "bgImage": "/imagenes/apple-minimal/2.jpg",
-        "pageNumber": 0
+        "bgImage": "/imagenes/2.png",
+        "pageNumber": 2
       }
     },
     {
@@ -40,35 +40,35 @@
         "id": "apple",
         "name": "APPLE",
         "type": "The collection.",
-        "bgImage": "/imagenes/apple-minimal/3.jpg",
-        "pageNumber": 0
+        "bgImage": "/imagenes/9.png",
+        "pageNumber": 3
       }
     },
     {
       "type": "chapterHero",
       "data": {
         "id": "snow",
-        "pageNumber": 0,
+        "pageNumber": 4,
         "name": "APPLE",
         "label": "Snow",
-        "bgImage": "/imagenes/apple-minimal/4.jpg"
+        "bgImage": "/imagenes/2.png"
       }
     },
     {
       "type": "productDetail",
       "data": {
         "id": "snow",
-        "pageNumber": 0,
+        "pageNumber": 5,
         "name": "APPLE",
         "type": "Snow PIECE",
-        "price": "S/ 000",
+        "price": "S/ 150",
         "description": [
           "Silk blend"
         ],
         "collageLayout": "one",
         "collageImages": [
           {
-            "src": "/imagenes/apple-minimal/4.jpg",
+            "src": "/imagenes/10.png",
             "alt": "APPLE Snow"
           }
         ],
@@ -76,7 +76,7 @@
           {
             "label": "Snow",
             "type": "color",
-            "color": "#f5f5f5"
+            "color": "#d90808"
           }
         ]
       }
@@ -87,8 +87,8 @@
         "title": "APPLE",
         "line1": "The Collection",
         "line2": "Available now.",
-        "bgImage": "/imagenes/apple-minimal/4.jpg",
-        "pageNumber": 0
+        "bgImage": "/imagenes/3.png",
+        "pageNumber": 6
       }
     }
   ]
