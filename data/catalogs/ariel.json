@@ -13,16 +13,16 @@
     {
       "type": "cover",
       "data": {
-        "title": "ANGEL DE CANELA",
+        "title": "Mawoa ",
         "meta": [
           "VOL.01",
           "2026",
-          "LOOKBOOK"
+          "Catálogo "
         ],
         "subtitle": "ESSENCE OF THE SEA — ARIEL COLLECTION",
         "bottomLine1": "ARIEL · SUMMER 2026",
         "bottomLine2": "Inspired by the beauty, breeze, and freedom of the sea.",
-        "bgImage": "/imagenes/1.png",
+        "bgImage": "/imagenes/img-6147.jpeg",
         "pageNumber": 1
       }
     },
@@ -105,8 +105,16 @@
           "PLEATED FABRIC | FLUID SILHOUETTE",
           "RESORT COLOURWAY"
         ],
-        "collageLayout": "two",
+        "collageLayout": "four",
         "collageImages": [
+          {
+            "src": "/imagenes/4.png",
+            "alt": "Ariel emerald portrait"
+          },
+          {
+            "src": "/imagenes/5.png",
+            "alt": "Ariel emerald front"
+          },
           {
             "src": "/imagenes/4.png",
             "alt": "Ariel emerald portrait"
