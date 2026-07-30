@@ -1,9 +1,9 @@
 "use client";
 
 import type { Block } from "@/data/schema";
+import { COLLAGE_LAYOUT_IMAGE_COUNT, deriveCollageLayout } from "@/data/schema";
 import TextField from "./fields/TextField";
 import TextAreaField from "./fields/TextAreaField";
-import SelectField from "./fields/SelectField";
 import StringListEditor from "./fields/StringListEditor";
 import CollageImagesEditor from "./fields/CollageImagesEditor";
 import SwatchesEditor from "./fields/SwatchesEditor";
@@ -13,12 +13,6 @@ type BlockFormProps = {
   block: Block;
   onChange: (block: Block) => void;
 };
-
-const COLLAGE_LAYOUTS = [
-  { value: "four", label: "4 fotos" },
-  { value: "three", label: "3 fotos" },
-  { value: "two", label: "2 fotos" },
-] as const;
 
 /**
  * Un formulario por tipo de bloque, con los campos que ese tipo
@@ -120,13 +114,14 @@ export default function BlockForm({ block, onChange }: BlockFormProps) {
           </div>
           <div className="admin-field-group">
             <h4>Fotos</h4>
-            <SelectField
-              label="Cantidad de fotos en el collage"
-              value={data.collageLayout}
-              options={COLLAGE_LAYOUTS}
-              onChange={(v) => set({ collageLayout: v as (typeof COLLAGE_LAYOUTS)[number]["value"] })}
+            <CollageImagesEditor
+              images={data.collageImages}
+              onChange={(v) => set({ collageImages: v, collageLayout: deriveCollageLayout(v.length) })}
             />
-            <CollageImagesEditor images={data.collageImages} onChange={(v) => set({ collageImages: v })} />
+            <p className="admin-field-hint">
+              Se muestran en una grilla de {COLLAGE_LAYOUT_IMAGE_COUNT[data.collageLayout]} fotos
+              (según la cantidad cargada arriba).
+            </p>
           </div>
           <div className="admin-field-group">
             <h4>Colores</h4>

@@ -36,6 +36,21 @@ export const COLLAGE_LAYOUT_IMAGE_COUNT: Record<CollageLayout, number> = {
   one: 1,
 };
 
+/**
+ * `collageLayout` siempre tiene que calzar con la cantidad real de
+ * `collageImages` (ver comentario arriba) — dejarlo como un campo
+ * editable a mano, separado del propio listado de fotos, es lo que
+ * permitió que se desincronizaran más de una vez en producción (ver
+ * decision log en CLAUDE.md). El admin ya no lo edita directamente:
+ * se deriva acá cada vez que cambia la lista de fotos.
+ */
+export function deriveCollageLayout(imageCount: number): CollageLayout {
+  if (imageCount >= 4) return "four";
+  if (imageCount === 3) return "three";
+  if (imageCount === 2) return "two";
+  return "one";
+}
+
 export const CollageImageSchema = z.object({
   src: z.string(),
   alt: z.string(),
