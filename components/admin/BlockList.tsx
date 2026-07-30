@@ -294,19 +294,12 @@ export default function BlockList({ items, onChange, footer, onFocusIndex }: Blo
 
   return (
     <div className="admin-page-groups">
-      {structure.length > 0 && (
-        <div className="admin-page-group">
-          <p className="admin-page-group-label">Estructura del catálogo</p>
-          <div className="admin-page-grid">{structure.map((g) => renderCard(g.item, g.index))}</div>
+      <div className="admin-page-group">
+        <p className="admin-page-group-label">Estructura del catálogo</p>
+        <div className="admin-page-grid">
+          {groups.map((g) => (g.kind === "single" ? renderCard(g.item, g.index) : renderColorwayCard(g)))}
         </div>
-      )}
-
-      {colorways.length > 0 && (
-        <div className="admin-page-group">
-          <p className="admin-page-group-label">Colorways · {colorways.length}</p>
-          <div className="admin-page-grid">{colorways.map((g) => renderColorwayCard(g))}</div>
-        </div>
-      )}
+      </div>
 
       {footer}
     </div>
