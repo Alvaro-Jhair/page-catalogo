@@ -603,6 +603,27 @@ a {
   .product-name h2 {
     font-size: clamp(2rem, 9vw, 3.8rem);
   }
+
+  /* En pantallas angostas y bajas (ej. 320×568, iPhone SE 1ra gen)
+     el párrafo envuelve a más líneas y, con el padding/line-height
+     pensados para desktop, la sección completa supera el alto del
+     viewport (medido: 650px de contenido en un viewport de 568px)
+     — rompe el supuesto de "una sección = una pantalla" del
+     scroll-snap, el mismo tipo de problema ya encontrado y corregido
+     en el collage/info el 2026-07-29. Detectado entonces, corregido
+     ahora: menos padding vertical y menos interlineado alcanza para
+     que quepa sin tocar nada en desktop/tablet. */
+  .manifesto {
+    padding: 48px 24px;
+  }
+
+  .manifesto h2 {
+    margin-bottom: 28px;
+  }
+
+  .manifesto p {
+    line-height: 1.65;
+  }
 }
 
 /* ───── CATALOG INDEX ("/", desde el índice multi-catálogo) ───── */
