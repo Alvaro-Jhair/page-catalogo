@@ -297,55 +297,82 @@
   line-height: 1;
 }
 
-/* ---- block list ---- */
+/* ---- páginas: grilla agrupada + edición enfocada (Fase 3 del rediseño) ----
+   Reemplaza el acordeón "todo en una lista" por dos grupos de tarjetas
+   (Estructura del catálogo / Colorways) — tocar una tarjeta abre una
+   vista enfocada de esa página sola, en vez de expandirla inline entre
+   las demás. */
 
-.admin-block-list {
+.admin-page-groups {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 28px;
   margin-bottom: 20px;
 }
 
-.admin-block {
+.admin-page-group-label {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6a6a64;
+}
+
+.admin-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.admin-page-card {
   background: #fff;
   border: 1px solid #e2e2df;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-/* ---- colorway groups (capítulo + detalle agrupados visualmente) ---- */
-.admin-colorway-group {
-  background: #f7f6f2;
-  border: 1px solid #e2e2df;
   border-radius: 10px;
-  padding: 10px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  transition: border-color 0.15s ease;
 }
 
-.admin-colorway-group-header {
+.admin-page-card:hover {
+  border-color: #b8b8b2;
+}
+
+.admin-page-card-open {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.admin-page-card-thumb {
+  aspect-ratio: 4 / 3;
+  background-color: #ececea;
+  background-size: cover;
+  background-position: center;
+}
+
+.admin-page-card-body {
+  padding: 9px 10px 10px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 2px 4px 4px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #666;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.admin-colorway-group .admin-block {
-  border-color: #d8d8d3;
-}
-
-.admin-block-summary {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
+.admin-page-card-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .admin-block-tag {
@@ -358,39 +385,65 @@
   padding: 3px 8px;
   border-radius: 100px;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
-.admin-block-title {
-  flex: 1;
-  font-size: 0.88rem;
+/* Aviso suave de "falta algo" en una tarjeta de página (Fase 5 del
+   rediseño) — puramente informativo, nunca bloquea Guardar. Color de
+   advertencia (ámbar) separado a propósito del acento del catálogo:
+   es un color semántico, no una elección de marca. */
+.admin-badge-warn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 0.64rem;
   font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: #8a5a17;
+  background: #fbf0dc;
+  border-radius: 999px;
+  padding: 3px 8px 3px 7px;
+  align-self: flex-start;
 }
 
-button.admin-block-title {
-  background: none;
-  border: none;
-  text-align: left;
-  cursor: pointer;
-  padding: 0;
-  font-family: inherit;
-  color: inherit;
+.admin-badge-warn::before {
+  content: "●";
+  font-size: 0.5rem;
 }
 
-.admin-block-controls {
+.admin-page-card-controls {
   display: flex;
-  gap: 6px;
-  flex-shrink: 0;
+  gap: 4px;
+  padding: 8px 10px 10px;
+  border-top: 1px solid #ececea;
 }
 
-.admin-block-form {
-  padding: 16px;
-  border-top: 1px solid #ececea;
+/* ---- página enfocada (drill-down) ---- */
+.admin-page-detail {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+}
+
+.admin-page-detail-back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6a6a64;
+  cursor: pointer;
+}
+
+.admin-page-detail-back:hover {
+  color: #1a1a1a;
+}
+
+.admin-page-detail-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 /* ---- fields ---- */
@@ -486,7 +539,7 @@ button.admin-block-title {
 
 .admin-collage-row {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: auto 1fr 1fr auto;
   gap: 8px;
   align-items: start;
 }
@@ -499,24 +552,120 @@ button.admin-block-title {
   margin-top: 26px;
 }
 
-/* ---- add block ---- */
-
-.admin-add-block {
+.admin-collage-drag-handle {
+  margin-top: 26px;
+  width: 32px;
+  height: 32px;
   display: flex;
-  gap: 8px;
   align-items: center;
-  padding: 14px;
-  background: #fff;
-  border: 1px dashed #c9c9c4;
-  border-radius: 8px;
-}
-
-.admin-add-block select {
-  flex: 1;
-  padding: 8px 9px;
+  justify-content: center;
   border: 1px solid #d5d5d0;
   border-radius: 5px;
+  background: #fff;
+  color: #6a6a64;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.admin-collage-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* ---- agregar página (Fase 3 del rediseño) ----
+   Reemplaza el <select> con los 6 tipos de bloque + botón por una
+   elección visual: "+ Colorway" grande (el caso común) y el resto
+   como chips secundarios chicos. */
+
+.admin-add-page-chooser {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.admin-add-page-primary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1.5px dashed #b8b8b2;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.admin-add-page-primary:hover {
+  border-color: #1a1a1a;
+  background: #faf9f7;
+}
+
+.admin-add-page-primary-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 100px;
+  background: #1a1a1a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.admin-add-page-primary-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-add-page-primary-text strong {
   font-size: 0.9rem;
+}
+
+.admin-add-page-primary-text small {
+  font-size: 0.74rem;
+  color: #6a6a64;
+}
+
+.admin-add-colorway-wrap {
+  position: relative;
+}
+
+.admin-add-colorway-wrap > .admin-btn-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.admin-add-page-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-add-page-secondary-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #d5d5d0;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.admin-add-page-secondary-btn:hover {
+  background: #ececea;
 }
 
 /* ---- theme editor ---- */
@@ -539,22 +688,35 @@ button.admin-block-title {
 .admin-theme-color {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .admin-theme-color input[type="color"] {
-  width: 34px;
-  height: 34px;
-  padding: 2px;
+  width: 48px;
+  height: 48px;
+  padding: 3px;
   border: 1px solid #d5d5d0;
-  border-radius: 5px;
+  border-radius: 8px;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
-.admin-theme-color label {
+.admin-theme-color-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.admin-theme-color-label {
   font-size: 0.8rem;
   font-weight: 600;
   color: #444;
+}
+
+.admin-theme-color-hex {
+  font-size: 0.7rem;
+  color: #6a6a64;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 .admin-theme-fonts {
@@ -736,9 +898,19 @@ button.admin-block-title {
 .admin-gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  align-content: start;
   gap: 8px;
   padding: 16px;
   overflow-y: auto;
+  /* .admin-gallery es flex-column con max-height: 80vh — sin flex+min-height
+     acá, esta grilla nunca se topa con un límite real y "overflow-y: auto"
+     no llega a activarse nunca: la caja entera crece con el contenido y
+     lo que no entra en 80vh queda directamente cortado (el overflow:hidden
+     del padre), en vez de scrollear. Con esto la grilla es la única parte
+     que scrollea, y la zona de subir/importar de abajo queda siempre
+     visible completa. */
+  flex: 1;
+  min-height: 0;
 }
 
 .admin-gallery-item {
@@ -801,14 +973,6 @@ button.admin-block-title {
 .admin-gallery-item-sync:disabled {
   opacity: 0.6;
   cursor: default;
-}
-
-.admin-gallery-upload {
-  padding: 14px 16px;
-  border-top: 1px solid #ececea;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 /* ---- admin panel (Fase B, 2026-07-28) ----
@@ -1023,6 +1187,67 @@ button.admin-block-title {
   .admin-panel-topbar-title {
     max-width: 40vw;
   }
+}
+
+/* ---- pestañas del editor (Portada / Páginas / Imágenes / Colores) ----
+   Reemplazan el panel de edición "todo en una sola lista larga" por
+   secciones separadas — el pedido explícito era "menos opciones
+   visibles al mismo tiempo". La franja de catálogo y la barra de
+   pestañas rompen el padding de .admin-panel-body a propósito (margin
+   negativo) para llegar borde a borde, igual que .admin-panel-header
+   ya hace por fuera de ese mismo padding. */
+.admin-idstrip {
+  margin: -20px -20px 0;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid #e2e2df;
+}
+
+.admin-idstrip-name {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+.admin-idstrip-meta {
+  margin: 3px 0 0;
+  font-size: 0.72rem;
+  color: #6a6a64;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 -20px;
+  padding: 0 20px;
+  border-bottom: 1px solid #e2e2df;
+  overflow-x: auto;
+}
+
+.admin-tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 12px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6a6a64;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-tab:hover {
+  color: #1a1a1a;
+}
+
+.admin-tab.active {
+  color: #1a1a1a;
+  border-bottom-color: #1a1a1a;
+}
+
+.admin-tab-content {
+  padding-top: 18px;
 }
 
 /* ---- wizard de creación (Fase C, 2026-07-28) ---- */

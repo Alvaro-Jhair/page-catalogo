@@ -4,13 +4,15 @@ import { useState, type ReactNode } from "react";
 import type { Block } from "@/data/schema";
 import BlockForm from "./BlockForm";
 import { useConfirm } from "./ConfirmDialogContext";
+import { groupItemsForDisplay, type DisplayGroup } from "./blockGrouping";
+import { checkCompleteness, checkColorwayCompleteness } from "./pageCompleteness";
 
 /**
  * `key` es un identificador sintético, solo para React/la UI del panel
  * — nunca viaja a data/schema.ts ni al commit. Hace falta porque
  * `block.data.id` puede estar vacío o duplicado mientras se edita, y
  * porque el orden cambia (subir/bajar), así que un índice de array no
- * alcanza para no perder el estado de "qué bloque está expandido".
+ * alcanza para no perder el estado de "qué página está abierta".
  */
 export type EditableBlock = {
   key: string;
@@ -43,13 +45,35 @@ function blockTitle(block: Block): string {
   }
 }
 
+function blockThumb(block: Block): string | null {
+  switch (block.type) {
+    case "cover":
+    case "manifesto":
+    case "productHero":
+    case "chapterHero":
+    case "closing":
+      return block.data.bgImage;
+    case "productDetail":
+      return block.data.collageImages[0]?.src ?? null;
+  }
+}
+
+/** Para una tarjeta de colorway: preferimos la foto real del detalle (la prenda en sí) sobre el fondo editorial del capítulo. */
+function colorwayThumb(chapter: Block, detail: Block): string | null {
+  return blockThumb(detail) ?? blockThumb(chapter);
+}
+
+type Active = { kind: "single"; key: string } | { kind: "colorway"; chapterKey: string };
+
 type BlockListProps = {
   items: EditableBlock[];
   onChange: (items: EditableBlock[]) => void;
+  /** Se muestra debajo de la grilla de tarjetas — nunca durante la edición enfocada de una página, para no ensuciar esa vista con la UI de "agregar" otra. */
+  footer?: ReactNode;
 };
 
-export default function BlockList({ items, onChange }: BlockListProps) {
-  const [expandedKey, setExpandedKey] = useState<string | null>(null);
+export default function BlockList({ items, onChange, footer }: BlockListProps) {
+  const [active, setActive] = useState<Active | null>(null);
   const confirm = useConfirm();
 
   const moveUp = (i: number) => {
@@ -67,8 +91,24 @@ export default function BlockList({ items, onChange }: BlockListProps) {
   };
 
   const remove = async (i: number) => {
-    if (!(await confirm({ message: "¿Quitar este bloque del catálogo?", confirmLabel: "Quitar", danger: true }))) return;
+    if (!(await confirm({ message: "¿Quitar esta página del catálogo?", confirmLabel: "Quitar", danger: true }))) return;
     onChange(items.filter((_, idx) => idx !== i));
+    setActive(null);
+  };
+
+  const removeColorway = async (chapterIndex: number) => {
+    if (
+      !(await confirm({
+        message: "¿Quitar este colorway del catálogo? Se borran sus dos páginas (capítulo y detalle).",
+        confirmLabel: "Quitar",
+        danger: true,
+      }))
+    )
+      return;
+    const next = [...items];
+    next.splice(chapterIndex, 2);
+    onChange(next);
+    setActive(null);
   };
 
   const updateBlock = (i: number, block: Block) => {
@@ -95,113 +135,164 @@ export default function BlockList({ items, onChange }: BlockListProps) {
   };
 
   if (items.length === 0) {
-    return <p>Este catálogo no tiene bloques todavía. Agregá uno abajo.</p>;
+    return (
+      <>
+        <p>Este catálogo no tiene páginas todavía. Agregá una abajo.</p>
+        {footer}
+      </>
+    );
   }
 
-  function renderCard(item: EditableBlock, i: number) {
-    const isOpen = expandedKey === item.key;
-    return (
-      <div className="admin-block" key={item.key}>
-        <div className="admin-block-summary">
-          <span className="admin-block-tag">{TYPE_LABELS[item.block.type]}</span>
-          <button
-            type="button"
-            className="admin-block-title"
-            onClick={() => setExpandedKey(isOpen ? null : item.key)}
-          >
-            {blockTitle(item.block)}
+  const groups = groupItemsForDisplay(items);
+  const structure = groups.filter((g): g is Extract<DisplayGroup, { kind: "single" }> => g.kind === "single");
+  const colorways = groups.filter((g): g is Extract<DisplayGroup, { kind: "colorway" }> => g.kind === "colorway");
+
+  // ---- vista de edición enfocada (drill-down) ----
+  if (active?.kind === "single") {
+    const group = structure.find((g) => g.item.key === active.key);
+    if (group) {
+      return (
+        <div className="admin-page-detail">
+          <button type="button" className="admin-page-detail-back" onClick={() => setActive(null)}>
+            ← Páginas
           </button>
-          <div className="admin-block-controls">
-            <button
-              type="button"
-              className="admin-btn admin-btn-icon"
-              onClick={() => moveUp(i)}
-              disabled={i === 0}
-              aria-label="Subir bloque"
-            >
-              ↑
-            </button>
-            <button
-              type="button"
-              className="admin-btn admin-btn-icon"
-              onClick={() => moveDown(i)}
-              disabled={i === items.length - 1}
-              aria-label="Bajar bloque"
-            >
-              ↓
-            </button>
-            <button
-              type="button"
-              className="admin-btn admin-btn-icon"
-              onClick={() => setExpandedKey(isOpen ? null : item.key)}
-            >
-              {isOpen ? "Cerrar" : "Editar"}
-            </button>
-            <button
-              type="button"
-              className="admin-btn admin-btn-icon admin-btn-danger"
-              onClick={() => remove(i)}
-              aria-label="Quitar bloque"
-            >
-              ✕
-            </button>
+          <h4 className="admin-page-detail-title">{TYPE_LABELS[group.item.block.type]}</h4>
+          <BlockForm block={group.item.block} onChange={(b) => updateBlock(group.index, b)} />
+        </div>
+      );
+    }
+  }
+
+  if (active?.kind === "colorway") {
+    const group = colorways.find((g) => g.chapter.key === active.chapterKey);
+    if (group) {
+      const chapterData = group.chapter.block.type === "chapterHero" ? group.chapter.block.data : null;
+      return (
+        <div className="admin-page-detail">
+          <button type="button" className="admin-page-detail-back" onClick={() => setActive(null)}>
+            ← Páginas
+          </button>
+          <h4 className="admin-page-detail-title">
+            Colorway: {chapterData?.label || chapterData?.name || "(sin nombre)"}
+          </h4>
+
+          <div className="admin-field-group">
+            <h4>Transición (capítulo)</h4>
+            <BlockForm block={group.chapter.block} onChange={(b) => updateBlock(group.chapterIndex, b)} />
+          </div>
+
+          <div className="admin-field-group">
+            <h4>Detalle</h4>
+            <BlockForm block={group.detail.block} onChange={(b) => updateBlock(group.detailIndex, b)} />
           </div>
         </div>
-        {isOpen && (
-          <div className="admin-block-form">
-            <BlockForm block={item.block} onChange={(b) => updateBlock(i, b)} />
+      );
+    }
+  }
+
+  // ---- grilla de tarjetas ----
+  function renderCard(item: EditableBlock, i: number) {
+    const thumb = blockThumb(item.block);
+    const completeness = checkCompleteness(item.block);
+    return (
+      <div className="admin-page-card" key={item.key}>
+        <button type="button" className="admin-page-card-open" onClick={() => setActive({ kind: "single", key: item.key })}>
+          <div className="admin-page-card-thumb" style={thumb ? { backgroundImage: `url(${thumb})` } : undefined} />
+          <div className="admin-page-card-body">
+            <span className="admin-block-tag">{TYPE_LABELS[item.block.type]}</span>
+            <p className="admin-page-card-title">{blockTitle(item.block)}</p>
+            {!completeness.ok && <span className="admin-badge-warn">Falta: {completeness.missing.join(", ")}</span>}
           </div>
-        )}
+        </button>
+        <div className="admin-page-card-controls">
+          <button type="button" className="admin-btn admin-btn-icon" onClick={() => moveUp(i)} disabled={i === 0} aria-label="Subir página">
+            ↑
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn-icon"
+            onClick={() => moveDown(i)}
+            disabled={i === items.length - 1}
+            aria-label="Bajar página"
+          >
+            ↓
+          </button>
+          <button type="button" className="admin-btn admin-btn-icon admin-btn-danger" onClick={() => remove(i)} aria-label="Quitar página">
+            ✕
+          </button>
+        </div>
       </div>
     );
   }
 
-  const cards: ReactNode[] = [];
-  for (let i = 0; i < items.length; i++) {
-    const current = items[i].block;
-    const nextItem = items[i + 1]?.block;
-    const isColorwayPair =
-      current.type === "chapterHero" &&
-      nextItem?.type === "productDetail" &&
-      current.data.id !== "" &&
-      current.data.id === nextItem.data.id;
-
-    if (isColorwayPair) {
-      cards.push(
-        <div className="admin-colorway-group" key={`group-${items[i].key}`}>
-          <div className="admin-colorway-group-header">
-            <span>Colorway: {current.data.label || current.data.name || "(sin nombre)"}</span>
-            <div className="admin-block-controls">
-              <button
-                type="button"
-                className="admin-btn admin-btn-icon"
-                onClick={() => moveGroupUp(i)}
-                disabled={i === 0}
-                aria-label="Subir colorway completo"
-              >
-                ↑↑
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn-icon"
-                onClick={() => moveGroupDown(i)}
-                disabled={i + 2 >= items.length}
-                aria-label="Bajar colorway completo"
-              >
-                ↓↓
-              </button>
-            </div>
+  function renderColorwayCard(group: Extract<DisplayGroup, { kind: "colorway" }>) {
+    const chapterData = group.chapter.block.type === "chapterHero" ? group.chapter.block.data : null;
+    const thumb = colorwayThumb(group.chapter.block, group.detail.block);
+    const label = chapterData?.label || chapterData?.name || "(sin nombre)";
+    const completeness = checkColorwayCompleteness(group.chapter.block, group.detail.block);
+    return (
+      <div className="admin-page-card" key={`colorway-${group.chapter.key}`}>
+        <button
+          type="button"
+          className="admin-page-card-open"
+          onClick={() => setActive({ kind: "colorway", chapterKey: group.chapter.key })}
+        >
+          <div className="admin-page-card-thumb" style={thumb ? { backgroundImage: `url(${thumb})` } : undefined} />
+          <div className="admin-page-card-body">
+            <span className="admin-block-tag">Colorway</span>
+            <p className="admin-page-card-title">{label}</p>
+            {!completeness.ok && <span className="admin-badge-warn">Falta: {completeness.missing.join(", ")}</span>}
           </div>
-          {renderCard(items[i], i)}
-          {renderCard(items[i + 1], i + 1)}
+        </button>
+        <div className="admin-page-card-controls">
+          <button
+            type="button"
+            className="admin-btn admin-btn-icon"
+            onClick={() => moveGroupUp(group.chapterIndex)}
+            disabled={group.chapterIndex === 0}
+            aria-label="Subir colorway"
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn-icon"
+            onClick={() => moveGroupDown(group.chapterIndex)}
+            disabled={group.chapterIndex + 2 >= items.length}
+            aria-label="Bajar colorway"
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn-icon admin-btn-danger"
+            onClick={() => removeColorway(group.chapterIndex)}
+            aria-label="Quitar colorway"
+          >
+            ✕
+          </button>
         </div>
-      );
-      i++; // ya se renderizó el par completo, saltar el segundo bloque
-      continue;
-    }
-
-    cards.push(renderCard(items[i], i));
+      </div>
+    );
   }
 
-  return <div className="admin-block-list">{cards}</div>;
+  return (
+    <div className="admin-page-groups">
+      {structure.length > 0 && (
+        <div className="admin-page-group">
+          <p className="admin-page-group-label">Estructura del catálogo</p>
+          <div className="admin-page-grid">{structure.map((g) => renderCard(g.item, g.index))}</div>
+        </div>
+      )}
+
+      {colorways.length > 0 && (
+        <div className="admin-page-group">
+          <p className="admin-page-group-label">Colorways · {colorways.length}</p>
+          <div className="admin-page-grid">{colorways.map((g) => renderColorwayCard(g))}</div>
+        </div>
+      )}
+
+      {footer}
+    </div>
+  );
 }

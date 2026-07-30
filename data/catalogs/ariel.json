@@ -104,7 +104,7 @@
     {
       "type": "chapterHero",
       "data": {
-        "id": "green",
+        "id": "emerald",
         "pageNumber": 5,
         "name": "ARIEL",
         "label": "EMERALD",
@@ -154,7 +154,7 @@
     {
       "type": "chapterHero",
       "data": {
-        "id": "black",
+        "id": "noir",
         "pageNumber": 7,
         "name": "ARIEL",
         "label": "NOIR",
@@ -204,7 +204,7 @@
     {
       "type": "chapterHero",
       "data": {
-        "id": "gold",
+        "id": "gold-dress",
         "pageNumber": 9,
         "name": "ARIEL",
         "label": "GOLD",

@@ -55,8 +55,12 @@ export default function ThemeEditor({ theme, onChange }: ThemeEditorProps) {
               type="color"
               value={theme[key] as string}
               onChange={(e) => set(key, e.target.value)}
+              aria-label={label}
             />
-            <label>{label}</label>
+            <div className="admin-theme-color-text">
+              <span className="admin-theme-color-label">{label}</span>
+              <span className="admin-theme-color-hex">{(theme[key] as string).toUpperCase()}</span>
+            </div>
           </div>
         ))}
       </div>
