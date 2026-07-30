@@ -30,3 +30,4 @@ Page-catalogo.zip
 public/catalog-*.pdf
 .vercel
 .env*
+!.env.example
