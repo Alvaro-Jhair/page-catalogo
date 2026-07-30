@@ -128,6 +128,23 @@ export default function AdminEditor({
     setItems(coverItem ? [coverItem, ...next] : next);
   };
 
+  // Hace scroll del fondo en vivo (el catálogo real, siempre montado
+  // detrás del panel — ver AdminPanel) hasta la página que se acaba de
+  // abrir para editar o de mover, en vez de dejarlo donde haya quedado.
+  // `pageItemsIndex` es el índice dentro de `pageItems` (lo que ve
+  // BlockList); se le suma 1 si hay portada porque esta vive aparte, en
+  // el índice 0 de `items` — que es el array real que ve AdminPanel. El
+  // rAF espera a que React termine de aplicar el reorden/cambio de
+  // estado antes de medir posiciones en el DOM; sin él se mide el orden
+  // viejo, todavía no pintado.
+  const focusLivePreview = (pageItemsIndex: number) => {
+    const itemsIndex = coverItem ? pageItemsIndex + 1 : pageItemsIndex;
+    requestAnimationFrame(() => {
+      const pages = document.querySelectorAll<HTMLElement>(".admin-panel-live .page");
+      pages[itemsIndex]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
   const addSingle = (type: Exclude<Block["type"], "cover" | "chapterHero" | "productDetail">) => {
     setPageItems([...pageItems, { key: makeKey(), block: defaultBlockFor(type) }]);
     showToast(`${TYPE_LABELS[type]} agregado`);
@@ -201,6 +218,7 @@ export default function AdminEditor({
           <BlockList
             items={pageItems}
             onChange={setPageItems}
+            onFocusIndex={focusLivePreview}
             footer={
               <AddPageChooser
                 defaultProductName={defaultProductName}

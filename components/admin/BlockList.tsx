@@ -70,9 +70,11 @@ type BlockListProps = {
   onChange: (items: EditableBlock[]) => void;
   /** Se muestra debajo de la grilla de tarjetas — nunca durante la edición enfocada de una página, para no ensuciar esa vista con la UI de "agregar" otra. */
   footer?: ReactNode;
+  /** Se llama con el índice (dentro de `items`) de la página que pasa a estar enfocada — al abrir su edición o al moverla — para que quien la use pueda hacer scroll del fondo en vivo hasta ahí. */
+  onFocusIndex?: (index: number) => void;
 };
 
-export default function BlockList({ items, onChange, footer }: BlockListProps) {
+export default function BlockList({ items, onChange, footer, onFocusIndex }: BlockListProps) {
   const [active, setActive] = useState<Active | null>(null);
   const confirm = useConfirm();
 
@@ -81,6 +83,7 @@ export default function BlockList({ items, onChange, footer }: BlockListProps) {
     const next = [...items];
     [next[i - 1], next[i]] = [next[i], next[i - 1]];
     onChange(next);
+    onFocusIndex?.(i - 1);
   };
 
   const moveDown = (i: number) => {
@@ -88,6 +91,7 @@ export default function BlockList({ items, onChange, footer }: BlockListProps) {
     const next = [...items];
     [next[i], next[i + 1]] = [next[i + 1], next[i]];
     onChange(next);
+    onFocusIndex?.(i + 1);
   };
 
   const remove = async (i: number) => {
@@ -124,6 +128,7 @@ export default function BlockList({ items, onChange, footer }: BlockListProps) {
     const pair = next.splice(startIndex, 2);
     next.splice(startIndex - 1, 0, ...pair);
     onChange(next);
+    onFocusIndex?.(startIndex - 1);
   };
 
   const moveGroupDown = (startIndex: number) => {
@@ -132,6 +137,7 @@ export default function BlockList({ items, onChange, footer }: BlockListProps) {
     const pair = next.splice(startIndex, 2);
     next.splice(startIndex + 1, 0, ...pair);
     onChange(next);
+    onFocusIndex?.(startIndex + 1);
   };
 
   if (items.length === 0) {
@@ -196,7 +202,14 @@ export default function BlockList({ items, onChange, footer }: BlockListProps) {
     const completeness = checkCompleteness(item.block);
     return (
       <div className="admin-page-card" key={item.key}>
-        <button type="button" className="admin-page-card-open" onClick={() => setActive({ kind: "single", key: item.key })}>
+        <button
+          type="button"
+          className="admin-page-card-open"
+          onClick={() => {
+            setActive({ kind: "single", key: item.key });
+            onFocusIndex?.(i);
+          }}
+        >
           <div className="admin-page-card-thumb" style={thumb ? { backgroundImage: `url(${thumb})` } : undefined} />
           <div className="admin-page-card-body">
             <span className="admin-block-tag">{TYPE_LABELS[item.block.type]}</span>
@@ -235,7 +248,10 @@ export default function BlockList({ items, onChange, footer }: BlockListProps) {
         <button
           type="button"
           className="admin-page-card-open"
-          onClick={() => setActive({ kind: "colorway", chapterKey: group.chapter.key })}
+          onClick={() => {
+            setActive({ kind: "colorway", chapterKey: group.chapter.key });
+            onFocusIndex?.(group.chapterIndex);
+          }}
         >
           <div className="admin-page-card-thumb" style={thumb ? { backgroundImage: `url(${thumb})` } : undefined} />
           <div className="admin-page-card-body">

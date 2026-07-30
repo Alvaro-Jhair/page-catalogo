@@ -34,7 +34,28 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
   const hero = entry.blocks.find((b) => b.type === "productHero");
   const name = hero ? toTitleCase(hero.data.name) : toTitleCase(id);
 
-  return { title: name };
+  // La portada del catálogo (bgImage del bloque "cover") es la imagen
+  // que arma la vista previa al compartir el link — ej. en WhatsApp —
+  // en vez de no mostrar ninguna. `subtitle` de la portada como
+  // descripción si existe (para Ariel es "Essence of the sea — Ariel
+  // Collection"); si no, cae al texto genérico del layout raíz.
+  const cover = entry.blocks.find((b) => b.type === "cover");
+  const description = cover?.data.subtitle || undefined;
+
+  return {
+    title: name,
+    description,
+    openGraph: {
+      title: name,
+      description,
+      images: cover ? [{ url: cover.data.bgImage }] : undefined,
+    },
+    twitter: {
+      title: name,
+      description,
+      images: cover ? [cover.data.bgImage] : undefined,
+    },
+  };
 }
 
 /**

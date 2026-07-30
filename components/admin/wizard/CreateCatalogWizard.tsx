@@ -222,7 +222,16 @@ export default function CreateCatalogWizard() {
             <p className="admin-image-picker-note">
               Completá o ajustá el texto de cada página. También se puede reordenar o quitar alguna colorway acá.
             </p>
-            <BlockList items={items} onChange={setItems} />
+            <BlockList
+              items={items}
+              onChange={setItems}
+              onFocusIndex={(index) => {
+                requestAnimationFrame(() => {
+                  const pages = document.querySelectorAll<HTMLElement>(".admin-panel-live .page");
+                  pages[index]?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+              }}
+            />
             <div className="admin-save-bar">
               <button type="button" className="admin-btn" onClick={() => setStep("images")} disabled={isPending}>
                 ← Atrás
