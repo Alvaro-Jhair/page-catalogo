@@ -41,7 +41,7 @@
         "id": "ariel",
         "name": "ARIEL",
         "type": "DRESS",
-        "bgImage": "/imagenes/3.png",
+        "bgImage": "https://yvjhzesgepr0wd9a.public.blob.vercel-storage.com/imagenes/9719012c-fec5-4ac0-a0c5-971c14ce233f.jpeg",
         "pageNumber": 3
       }
     },
