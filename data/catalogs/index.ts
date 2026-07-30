@@ -9,14 +9,12 @@
 import { catalogEntry as entry0 } from "./apple";
 import { catalogEntry as entry1 } from "./ariel";
 import { catalogEntry as entry2 } from "./lux";
-import { catalogEntry as entry3 } from "./mawoa";
 import type { CatalogEntry } from "../schema";
 
 export const catalogs = {
   "apple": entry0,
   "ariel": entry1,
   "lux": entry2,
-  "mawoa": entry3,
 } satisfies Record<string, CatalogEntry>;
 
 export type CatalogId = keyof typeof catalogs;
