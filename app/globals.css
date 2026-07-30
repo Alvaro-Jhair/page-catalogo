@@ -562,7 +562,27 @@ a {
     grid-template-columns: 1fr 1fr;
   }
 
+  /* En mobile el texto envuelve a más líneas que en desktop (ej.
+     "COLOURWAYS: IVORY · EMERALD · NOIR · GOLD" pasa a 2 líneas) —
+     el 70/30 pensado para desktop no le deja suficiente alto real a
+     .info. Fix real, 2026-07-29 — reportado con una captura real
+     desde un navegador in-app (WhatsApp), que le resta al viewport
+     bastante más que el propio Safari. Dos partes: más proporción de
+     alto para .info (menos ajustado que el 70/30 de desktop), y
+     `justify-content: flex-start` en vez de `center` — en un viewport
+     lo bastante chico como para que el contenido no entre igual, con
+     `center` lo que sobra se recorta mitad arriba/mitad abajo
+     (tapando el título contra el borde del collage); con
+     `flex-start` el título siempre queda visible desde arriba y, en
+     el peor caso, lo que se recorta es el precio/número de página al
+     final — un recorte mucho menos grave que perder el título. */
+  .collage {
+    flex: 6 1 0;
+  }
+
   .info {
+    flex: 4 1 0;
+    justify-content: flex-start;
     padding: 22px 18px 50px;
   }
 
