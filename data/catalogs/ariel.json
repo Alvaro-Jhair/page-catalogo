@@ -1,10 +1,10 @@
 {
   "layoutId": "original",
   "theme": {
-    "ink": "#151515",
-    "paper": "#f8f6f2",
-    "line": "#262626",
-    "muted": "#6f6a64",
+    "ink": "#111111",
+    "paper": "#ffffff",
+    "line": "#222222",
+    "muted": "#111111",
     "accent": "#d5c8b7",
     "displayFont": "Georgia, \"Times New Roman\", \"Playfair Display\", serif",
     "bodyFont": "Arial, Helvetica, sans-serif"
