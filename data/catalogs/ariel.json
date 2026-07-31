@@ -31,7 +31,7 @@
       "data": {
         "heading": "RESORT WEAR FOR SUNLIT MOMENTS",
         "paragraph": "INSPIRED BY THE BEAUTY, BREEZE, AND FREEDOM OF THE SEA, THE ARIEL COLLECTION BLENDS FLUID PLEATS WITH A SOFT RESORT STATE OF MIND. LIGHTWEIGHT MOVEMENT, SCULPTED NECKLINES, AND OPEN-BACK DETAILS DESIGNED FOR WARM DAYS, COOL EVENINGS, AND ENDLESS ESCAPES.",
-        "bgImage": "/imagenes/2.png",
+        "bgImage": "/imagenes/base-20260731-b049bace.webp",
         "pageNumber": 2
       }
     },
@@ -41,7 +41,7 @@
         "id": "ariel",
         "name": "ARIEL",
         "type": "DRESS",
-        "bgImage": "/imagenes/1.png",
+        "bgImage": "/imagenes/base-20260731-c6c17dd3.webp",
         "pageNumber": 3
       }
     },
@@ -61,11 +61,11 @@
         "collageLayout": "two",
         "collageImages": [
           {
-            "src": "/imagenes/1.png",
+            "src": "/imagenes/base-20260731-c6c17dd3.webp",
             "alt": "Ariel ivory side"
           },
           {
-            "src": "/imagenes/4.png",
+            "src": "/imagenes/base-20260731-6d30cbba.webp",
             "alt": "Ariel ivory beach back"
           }
         ],
@@ -90,7 +90,7 @@
         "pageNumber": 5,
         "name": "ARIEL",
         "label": "EMERALD",
-        "bgImage": "/imagenes/4.png"
+        "bgImage": "/imagenes/base-20260731-6d30cbba.webp"
       }
     },
     {
@@ -108,19 +108,19 @@
         "collageLayout": "four",
         "collageImages": [
           {
-            "src": "/imagenes/4.png",
+            "src": "/imagenes/base-20260731-6d30cbba.webp",
             "alt": "Ariel emerald portrait"
           },
           {
-            "src": "/imagenes/5.png",
+            "src": "/imagenes/base-20260731-bcab6625.webp",
             "alt": "Ariel emerald front"
           },
           {
-            "src": "/imagenes/4.png",
+            "src": "/imagenes/base-20260731-6d30cbba.webp",
             "alt": "Ariel emerald portrait"
           },
           {
-            "src": "/imagenes/5.png",
+            "src": "/imagenes/base-20260731-bcab6625.webp",
             "alt": "Ariel emerald front"
           }
         ],
@@ -128,7 +128,7 @@
           {
             "label": "Emerald",
             "type": "image",
-            "image": "/imagenes/4.png"
+            "image": "/imagenes/base-20260731-6d30cbba.webp"
           }
         ]
       }
@@ -140,7 +140,7 @@
         "pageNumber": 7,
         "name": "ARIEL",
         "label": "NOIR",
-        "bgImage": "/imagenes/6.png"
+        "bgImage": "/imagenes/base-20260731-3bf9ec09.webp"
       }
     },
     {
@@ -158,19 +158,19 @@
         "collageLayout": "four",
         "collageImages": [
           {
-            "src": "/imagenes/6.png",
+            "src": "/imagenes/base-20260731-3bf9ec09.webp",
             "alt": "Ariel noir studio front"
           },
           {
-            "src": "/imagenes/7.png",
+            "src": "/imagenes/base-20260731-f3aa87fc.webp",
             "alt": "Ariel noir studio side"
           },
           {
-            "src": "/imagenes/8.png",
+            "src": "/imagenes/base-20260731-2770b8f3.webp",
             "alt": "Ariel noir studio back"
           },
           {
-            "src": "/imagenes/9.png",
+            "src": "/imagenes/base-20260731-484498df.webp",
             "alt": "Ariel noir beach front"
           }
         ],
@@ -178,7 +178,7 @@
           {
             "label": "Noir",
             "type": "image",
-            "image": "/imagenes/6.png"
+            "image": "/imagenes/base-20260731-3bf9ec09.webp"
           }
         ]
       }
@@ -190,7 +190,7 @@
         "pageNumber": 9,
         "name": "ARIEL",
         "label": "GOLD",
-        "bgImage": "/imagenes/8.png"
+        "bgImage": "/imagenes/base-20260731-2770b8f3.webp"
       }
     },
     {
@@ -208,15 +208,15 @@
         "collageLayout": "three",
         "collageImages": [
           {
-            "src": "/imagenes/8.png",
+            "src": "/imagenes/base-20260731-2770b8f3.webp",
             "alt": "Ariel gold front"
           },
           {
-            "src": "/imagenes/9.png",
+            "src": "/imagenes/base-20260731-484498df.webp",
             "alt": "Ariel gold back"
           },
           {
-            "src": "/imagenes/10.png",
+            "src": "/imagenes/base-20260731-da8a6c1c.webp",
             "alt": "Ariel gold beach"
           }
         ],
@@ -224,7 +224,7 @@
           {
             "label": "Gold",
             "type": "image",
-            "image": "/imagenes/8.png"
+            "image": "/imagenes/base-20260731-2770b8f3.webp"
           }
         ]
       }
@@ -235,7 +235,7 @@
         "title": "ARIEL",
         "line1": "ESSENCE OF THE SEA · SUMMER 2026",
         "line2": "ANGEL DE CANELA",
-        "bgImage": "/imagenes/10.png",
+        "bgImage": "/imagenes/base-20260731-da8a6c1c.webp",
         "pageNumber": 11
       }
     }

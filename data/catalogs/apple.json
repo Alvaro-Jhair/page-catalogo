@@ -21,7 +21,7 @@
         "subtitle": "Designed to disappear into your day.",
         "bottomLine1": "APPLE",
         "bottomLine2": "Available now.",
-        "bgImage": "/imagenes/1.png",
+        "bgImage": "/imagenes/base-20260731-c6c17dd3.webp",
         "pageNumber": 1
       }
     },
@@ -30,7 +30,7 @@
       "data": {
         "heading": "Simplicity, considered.",
         "paragraph": "Nothing extra. Nothing missing.",
-        "bgImage": "/imagenes/2.png",
+        "bgImage": "/imagenes/base-20260731-b049bace.webp",
         "pageNumber": 2
       }
     },
@@ -40,7 +40,7 @@
         "id": "apple",
         "name": "APPLE",
         "type": "The collection.",
-        "bgImage": "/imagenes/9.png",
+        "bgImage": "/imagenes/base-20260731-484498df.webp",
         "pageNumber": 3
       }
     },
@@ -51,7 +51,7 @@
         "pageNumber": 4,
         "name": "APPLE",
         "label": "Snow",
-        "bgImage": "/imagenes/2.png"
+        "bgImage": "/imagenes/base-20260731-b049bace.webp"
       }
     },
     {
@@ -68,7 +68,7 @@
         "collageLayout": "one",
         "collageImages": [
           {
-            "src": "/imagenes/10.png",
+            "src": "/imagenes/base-20260731-da8a6c1c.webp",
             "alt": "APPLE Snow"
           }
         ],
@@ -87,7 +87,7 @@
         "title": "APPLE",
         "line1": "The Collection",
         "line2": "Available now.",
-        "bgImage": "/imagenes/3.png",
+        "bgImage": "/imagenes/base-20260731-a9b1d10c.webp",
         "pageNumber": 6
       }
     }

@@ -22,7 +22,7 @@
         "subtitle": "The art of restraint",
         "bottomLine1": "LUX · 2026",
         "bottomLine2": "Shot on location, styled for the season.",
-        "bgImage": "/imagenes/editorial-lux/1.jpg",
+        "bgImage": "/imagenes/editorial-lux-20260731-a75f5fb6.webp",
         "pageNumber": 0
       }
     },
@@ -31,7 +31,7 @@
       "data": {
         "heading": "AN EDITED LIFE",
         "paragraph": "Every piece earns its place. Nothing here is accidental — it is chosen, considered, worn with intention.",
-        "bgImage": "/imagenes/editorial-lux/2.jpg",
+        "bgImage": "/imagenes/editorial-lux-20260731-b5d4c216.webp",
         "pageNumber": 0
       }
     },
@@ -41,7 +41,7 @@
         "id": "lux",
         "name": "LUX",
         "type": "COLLECTION",
-        "bgImage": "/imagenes/editorial-lux/3.jpg",
+        "bgImage": "/imagenes/editorial-lux-20260731-6c68cd33.webp",
         "pageNumber": 0
       }
     },
@@ -52,7 +52,7 @@
         "pageNumber": 0,
         "name": "LUX",
         "label": "ROUGE",
-        "bgImage": "/imagenes/editorial-lux/4.jpg"
+        "bgImage": "/imagenes/editorial-lux-20260731-5e498f5f.webp"
       }
     },
     {
@@ -70,11 +70,11 @@
         "collageLayout": "two",
         "collageImages": [
           {
-            "src": "/imagenes/editorial-lux/4.jpg",
+            "src": "/imagenes/editorial-lux-20260731-5e498f5f.webp",
             "alt": "LUX ROUGE"
           },
           {
-            "src": "/imagenes/editorial-lux/5.jpg",
+            "src": "/imagenes/editorial-lux-20260731-d6fd8a0a.webp",
             "alt": "LUX ROUGE"
           }
         ],
@@ -94,7 +94,7 @@
         "pageNumber": 0,
         "name": "LUX",
         "label": "NOIR",
-        "bgImage": "/imagenes/editorial-lux/1.jpg"
+        "bgImage": "/imagenes/editorial-lux-20260731-a75f5fb6.webp"
       }
     },
     {
@@ -112,11 +112,11 @@
         "collageLayout": "two",
         "collageImages": [
           {
-            "src": "/imagenes/editorial-lux/1.jpg",
+            "src": "/imagenes/editorial-lux-20260731-a75f5fb6.webp",
             "alt": "LUX NOIR"
           },
           {
-            "src": "/imagenes/editorial-lux/2.jpg",
+            "src": "/imagenes/editorial-lux-20260731-b5d4c216.webp",
             "alt": "LUX NOIR"
           }
         ],
@@ -135,7 +135,7 @@
         "title": "LUX",
         "line1": "THE COLLECTION",
         "line2": "Available now.",
-        "bgImage": "/imagenes/editorial-lux/4.jpg",
+        "bgImage": "/imagenes/editorial-lux-20260731-5e498f5f.webp",
         "pageNumber": 0
       }
     }
