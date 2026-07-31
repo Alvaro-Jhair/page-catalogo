@@ -13,16 +13,16 @@
     {
       "type": "cover",
       "data": {
-        "title": "ANGEL DE CANELA",
+        "title": "demo",
         "meta": [
-          "VOL.01",
-          "2026",
-          "LOOKBOOK"
+          "VOL.0112",
+          "202612",
+          "LOOKBOOKdcedc"
         ],
         "subtitle": "ESSENCE OF THE SEA — ARIEL COLLECTION",
-        "bottomLine1": "ARIEL · SUMMER 2026",
+        "bottomLine1": "ARIEL · SUMMER 2026ce",
         "bottomLine2": "Inspired by the beauty, breeze, and freedom of the sea.",
-        "bgImage": "https://yvjhzesgepr0wd9a.public.blob.vercel-storage.com/imagenes/1.webp",
+        "bgImage": "https://yvjhzesgepr0wd9a.public.blob.vercel-storage.com/imagenes/images.jpeg",
         "pageNumber": 1
       }
     },
@@ -41,7 +41,7 @@
         "id": "ariel",
         "name": "ARIEL",
         "type": "DRESS",
-        "bgImage": "https://yvjhzesgepr0wd9a.public.blob.vercel-storage.com/imagenes/9719012c-fec5-4ac0-a0c5-971c14ce233f.jpeg",
+        "bgImage": "/imagenes/1.png",
         "pageNumber": 3
       }
     },
