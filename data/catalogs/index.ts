@@ -6,7 +6,6 @@
 // agrega un catálogo desde el panel — no editar a mano el orden de
 // imports, se reescribe completo a partir de la lista de ids.
 
-import { catalogEntry as entry0 } from "./prueba-dos";
 import type { CatalogEntry } from "../schema";
 
 // Tipado explícito (no `satisfies`) a propósito: con un registro
@@ -18,7 +17,6 @@ import type { CatalogEntry } from "../schema";
 // el último catálogo de un registro). Con la anotación explícita el
 // tipo es siempre `Record<string, CatalogEntry>`, vacío o no.
 export const catalogs: Record<string, CatalogEntry> = {
-  "prueba-dos": entry0,
 };
 
 export type CatalogId = keyof typeof catalogs;
