@@ -6,15 +6,19 @@
 // agrega un catálogo desde el panel — no editar a mano el orden de
 // imports, se reescribe completo a partir de la lista de ids.
 
-import { catalogEntry as entry0 } from "./apple";
-import { catalogEntry as entry1 } from "./ariel";
-import { catalogEntry as entry2 } from "./lux";
+
 import type { CatalogEntry } from "../schema";
 
-export const catalogs = {
-  "apple": entry0,
-  "ariel": entry1,
-  "lux": entry2,
-} satisfies Record<string, CatalogEntry>;
+// Tipado explícito (no `satisfies`) a propósito: con un registro
+// vacío (`ids` = []), `satisfies Record<string, CatalogEntry>` deja
+// que TS infiera el tipo del objeto literal `{}` en vez de ensancharlo
+// — `keyof {}` es `never`, y `CatalogId = keyof typeof catalogs`
+// colapsaba a `never`, rompiendo la compilación en cualquier archivo
+// que indexara `catalogs[id]` (encontrado de verdad al probar borrar
+// el último catálogo de un registro). Con la anotación explícita el
+// tipo es siempre `Record<string, CatalogEntry>`, vacío o no.
+export const catalogs: Record<string, CatalogEntry> = {
+
+};
 
 export type CatalogId = keyof typeof catalogs;

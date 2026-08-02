@@ -945,6 +945,13 @@ a {
   margin-bottom: 48px;
 }
 
+.catalog-index-empty {
+  margin: 40px auto;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
 .catalog-index-header p {
   margin: 0;
   font-size: 0.8rem;

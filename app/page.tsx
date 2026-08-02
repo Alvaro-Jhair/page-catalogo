@@ -25,6 +25,15 @@ export default function HomePage() {
       <div className="catalog-index-header">
         <p>Catálogos</p>
       </div>
+      {/* Sin catálogos publicados la página quedaba completamente en
+          blanco: solo el título y una franja de fondo. Pasa de verdad —
+          es el estado de un sitio recién puesto en línea, antes del
+          primer catálogo — y esta URL es pública. */}
+      {entries.length === 0 && (
+        <p className="catalog-index-empty">
+          Todavía no hay catálogos publicados.
+        </p>
+      )}
       <div className="catalog-index-grid">
         {entries.map(([id, entry]) => {
           const cover = getCoverBlock(entry.blocks);
