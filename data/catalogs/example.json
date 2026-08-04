@@ -1,0 +1,143 @@
+{
+  "layoutId": "original",
+  "theme": {
+    "ink": "#2b1810",
+    "paper": "#f5ede4",
+    "line": "#3d2418",
+    "muted": "#8a7361",
+    "accent": "#c1652f",
+    "displayFont": "Didot, \"Bodoni MT\", \"Playfair Display\", serif",
+    "bodyFont": "Futura, \"Century Gothic\", sans-serif"
+  },
+  "blocks": [
+    {
+      "type": "cover",
+      "data": {
+        "title": "EXAMPLE",
+        "meta": [
+          "VOL. 01",
+          "2026",
+          "LOOKBOOK"
+        ],
+        "subtitle": "A NEW CHAPTER IN THE COLLECTION",
+        "bottomLine1": "EXAMPLE · 2026",
+        "bottomLine2": "Crafted for those who dare to stand out.",
+        "bgImage": "/imagenes/terracota-bold-20260802-88a3d9e2.webp",
+        "pageNumber": 1
+      }
+    },
+    {
+      "type": "manifesto",
+      "data": {
+        "heading": "DESIGNED TO BE SEEN",
+        "paragraph": "Every piece in this collection is built on contrast — bold silhouettes, rich textures, and details made to turn heads. This is fashion with intention, made for the moments that matter.",
+        "bgImage": "/imagenes/placeholder-20260802-4dbc0b18.webp",
+        "pageNumber": 2
+      }
+    },
+    {
+      "type": "productHero",
+      "data": {
+        "id": "example",
+        "name": "EXAMPLE",
+        "type": "COLLECTION",
+        "bgImage": "/imagenes/terracota-bold-20260802-bba90c55.webp",
+        "pageNumber": 3
+      }
+    },
+    {
+      "type": "chapterHero",
+      "data": {
+        "id": "colorway-1",
+        "pageNumber": 4,
+        "name": "EXAMPLE",
+        "label": "Colorway 1",
+        "bgImage": "/imagenes/terracota-bold-20260802-ec777e77.webp"
+      }
+    },
+    {
+      "type": "productDetail",
+      "data": {
+        "id": "colorway-1",
+        "pageNumber": 5,
+        "name": "EXAMPLE",
+        "type": "Colorway 1 PIECE",
+        "price": "S/ 000",
+        "description": [
+          "BOLD SILHOUETTE | STATEMENT DETAIL",
+          "SIGNATURE COLOURWAY"
+        ],
+        "collageLayout": "two",
+        "collageImages": [
+          {
+            "src": "/imagenes/terracota-bold-20260802-ec777e77.webp",
+            "alt": "EXAMPLE Colorway 1"
+          },
+          {
+            "src": "/imagenes/terracota-bold-20260802-6621478e.webp",
+            "alt": "EXAMPLE Colorway 1"
+          }
+        ],
+        "swatches": [
+          {
+            "label": "Colorway 1",
+            "type": "color",
+            "color": "#c1652f"
+          }
+        ]
+      }
+    },
+    {
+      "type": "chapterHero",
+      "data": {
+        "id": "colorway-2",
+        "pageNumber": 6,
+        "name": "EXAMPLE",
+        "label": "Colorway 2",
+        "bgImage": "/imagenes/terracota-bold-20260802-6621478e.webp"
+      }
+    },
+    {
+      "type": "productDetail",
+      "data": {
+        "id": "colorway-2",
+        "pageNumber": 7,
+        "name": "EXAMPLE",
+        "type": "Colorway 2 PIECE",
+        "price": "S/ 000",
+        "description": [
+          "RICH TEXTURE | SCULPTED FIT",
+          "AFTER-DARK COLOURWAY"
+        ],
+        "collageLayout": "two",
+        "collageImages": [
+          {
+            "src": "/imagenes/terracota-bold-20260802-6621478e.webp",
+            "alt": "EXAMPLE Colorway 2"
+          },
+          {
+            "src": "/imagenes/terracota-bold-20260802-bba90c55.webp",
+            "alt": "EXAMPLE Colorway 2"
+          }
+        ],
+        "swatches": [
+          {
+            "label": "Colorway 2",
+            "type": "color",
+            "color": "#2b1810"
+          }
+        ]
+      }
+    },
+    {
+      "type": "closing",
+      "data": {
+        "title": "EXAMPLE",
+        "line1": "THE COLLECTION",
+        "line2": "Available now.",
+        "bgImage": "/imagenes/terracota-bold-20260802-88a3d9e2.webp",
+        "pageNumber": 8
+      }
+    }
+  ]
+}
